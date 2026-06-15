@@ -7,6 +7,7 @@ from ml.property_data import get_property_data
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Recommendation scoring is intentionally lightweight so it can run inline with the API request.
 def as_float(value, default=0.0):
     try:
         return float(value)

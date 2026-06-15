@@ -2,6 +2,7 @@ import { findFlatByPropId } from '../db/localDataStore.js'
 
 export const getPropertyRecommendations = async (req, res) => {
   try {
+    // Hydrate the ranked IDs from Django into full property cards for the UI.
     const data = Array.isArray(req.body) ? req.body : (req.body ? [req.body] : [])
     const propertyList = []
 

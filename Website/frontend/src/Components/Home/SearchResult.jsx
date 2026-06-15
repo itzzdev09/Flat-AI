@@ -17,6 +17,7 @@ const SearchResult = () => {
   const storageKey = user ? `wishList:${user._id}` : 'wishList';
 
   const wishlistHandler = (flat) => {
+    // Wishlist is stored locally so this stays instant even without a server round-trip.
     if (!token) {
       navigate('/login');
       return;

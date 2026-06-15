@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Define the async thunk for fetching recommendations
+// This thunk sends the predicted price and query shape to the recommendation API.
 export const fetchData = createAsyncThunk(
   'Prediction_Suggestion/fetchData',
   async (data) => {
@@ -14,7 +14,7 @@ export const fetchData = createAsyncThunk(
   }
 );
 
-// Define the slice
+// Redux state for the recommendation carousel on the prediction page.
 export const RecommendationSlice = createSlice({
   name: 'predictionSuggestion',
   initialState: { data: null, loading: false, error: null },

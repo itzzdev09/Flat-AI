@@ -17,14 +17,12 @@ import { createUser, findUserByEmail } from './db/userStore.js'
 import { hashPassword } from './utils/password.js'
 import { getMongoUri } from './db/db.js'
 
-
-
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 dotenv.config({ path: path.join(__dirname, '.env') })
 const app = express()
-// Middleware
+// Global middleware that keeps the API simple for the React client.
 app.use(cors())
 app.use(bodyParser.json())
 app.use(express.json())

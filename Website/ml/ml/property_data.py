@@ -9,6 +9,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PICKLE_DATA_PATH = os.path.abspath(os.path.join(BASE_DIR, 'pkl', 'prediction_df.pkl'))
 BACKEND_ENV_PATH = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Backend', '.env'))
 MONGODB_DB_NAME = os.getenv('MONGODB_DB_NAME', 'realestate')
+PREFER_MONGO = os.getenv('ML_PREFER_MONGO', 'false').lower() == 'true'
 
 
 def _read_backend_env():
@@ -38,6 +39,11 @@ def _load_pickle_data():
 
 @lru_cache(maxsize=1)
 def get_property_data():
+    # The local pickle is the fastest and most reliable source for prediction.
+    # MongoDB remains an opt-in fallback when you explicitly want live data.
+    if not PREFER_MONGO:
+        return _load_pickle_data()
+
     mongo_uri = get_mongodb_uri()
     if mongo_uri:
         client = None

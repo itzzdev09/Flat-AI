@@ -1,5 +1,9 @@
 #!/usr/bin/env python
-"""Django's command-line utility for administrative tasks."""
+"""Django's command-line utility for administrative tasks.
+
+This project keeps the ML API in a standalone Django app, so manage.py is the
+entry point for migrations, checks, and the local API server.
+"""
 import os
 import sys
 

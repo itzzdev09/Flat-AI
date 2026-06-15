@@ -65,9 +65,11 @@ const Predict = () => {
     setError('');
     setLoading(true);
 
+    // The ML API expects the same field names used by the Django scorer.
     const query = { location, bedroom, balcony, area, age, furnish, amenity, floor };
 
     try {
+      // One request returns the prediction immediately, so the UI stays responsive.
       const response = await axios.post(`${process.env.REACT_APP_DJANGO_API_URL}submit/`, query);
       const result = response.data;
       const predictionPayload = { prediction: result.prediction };
@@ -99,6 +101,7 @@ const Predict = () => {
     const getSuggestion = async () => {
       if (!formDataForRecommendation || !formDataForRecommendation.PRICE) return;
       try {
+        // Recommendation is a second step that ranks similar homes for the predicted price.
         const response = await axios.post(
           `${process.env.REACT_APP_DJANGO_API_URL}recommend/Prediction-recommendations/`,
           formDataForRecommendation

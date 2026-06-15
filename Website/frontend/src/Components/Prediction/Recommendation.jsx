@@ -14,11 +14,13 @@ const Recommendation = ({ data }) => {
   const { data: result, loading, error } = useSelector((state) => state.predictionSuggestion);
 
   useEffect(() => {
+    // Only call the hydrator when the Node API returns ranked property IDs.
     if (Array.isArray(data) && data.length > 0) {
       dispatch(fetchData(data));
     }
   }, [data, dispatch]);
 
+  // Keep the carousel simple so it loads quickly on the prediction page.
   const sliderSettings = {
     dots: true,
     infinite: true,

@@ -18,6 +18,7 @@ const PropertyCard = ({ flat }) => {
   const storageKey = user ? `wishList:${user._id}` : 'wishList';
 
   const wishlistHandler = () => {
+    // Keep the visual saved-state local so the card feels responsive.
     if (!token) {
       navigate('/login');
       return;
@@ -119,6 +120,7 @@ const AllFlats = () => {
   const totalPages = Math.ceil(total / limit) || 1;
 
   const getPageNumbers = () => {
+    // Build a compact pagination strip without rendering every page number.
     const pages = [];
     const delta = 2;
 

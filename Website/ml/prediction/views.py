@@ -5,6 +5,7 @@ import uuid
 
 from ml.property_data import get_property_data
 
+# Keeps the last prediction for the lightweight fetch endpoint used by older clients.
 predictions_store = {}
 
 AGE_ALIASES = {
@@ -117,6 +118,7 @@ def comparable_score(source, item):
 
 
 def estimate_price(data):
+    # Score nearby listings, then blend their price-per-sqft into a rough market estimate.
     source = normalize_query(data)
     properties = get_property_data()
 
@@ -164,6 +166,7 @@ def estimate_price(data):
 
 @csrf_exempt
 def submit(request):
+    # Main prediction endpoint: accepts a flat query and returns a price band immediately.
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -182,6 +185,7 @@ def submit(request):
 
 
 def fetch_data(request):
+    # Backward-compatible endpoint for older frontend code that still polls by session id.
     if request.method == 'GET':
         session_id = request.GET.get('session_id')
         prediction = predictions_store.get(session_id)

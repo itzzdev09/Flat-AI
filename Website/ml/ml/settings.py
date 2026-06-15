@@ -47,6 +47,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'ml.urls'
 
+# Django's dev server expects a static URL even when this app mostly serves APIs.
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
