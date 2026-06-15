@@ -40,7 +40,7 @@ def _load_pickle_data():
 @lru_cache(maxsize=1)
 def get_property_data():
     # The local pickle is the fastest and most reliable source for prediction.
-    # MongoDB remains an opt-in fallback when you explicitly want live data.
+    # MongoDB remains an opt-in fallback when live data is explicitly enabled.
     if not PREFER_MONGO:
         return _load_pickle_data()
 

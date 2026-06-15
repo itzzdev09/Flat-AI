@@ -30,7 +30,7 @@ async function run() {
     const collections = await mongoose.connection.db.listCollections().toArray();
     console.log('Collections:', collections.map(c => c.name));
     
-    // Check Flat_Data count
+    // The Flat_Data count is checked here.
     if (collections.some(c => c.name === 'Flat_Data')) {
       const count = await mongoose.connection.db.collection('Flat_Data').countDocuments();
       console.log('Flat_Data count:', count);

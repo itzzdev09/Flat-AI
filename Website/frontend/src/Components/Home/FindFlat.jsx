@@ -41,7 +41,7 @@ const FindFlat = () => {
   };
 
   useEffect(() => {
-    // Debounce the search so typing does not spam the backend on every keystroke.
+    // The search stays debounced so typing does not spam the backend on every keystroke.
     const hasFilters = location.trim() || bedroom || property;
     const timer = window.setTimeout(() => {
       if (hasFilters) {

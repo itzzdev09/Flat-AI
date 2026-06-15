@@ -4,14 +4,14 @@ import axios from 'axios'
 
 
 
-//api example:  http://localhost:5000/api/singleProperty/66eed19b61014329315fb19a
+// API example: http://localhost:5000/api/singleProperty/66eed19b61014329315fb19a
 
-// Define the async thunk for fetching user data
+// The async thunk fetches property data.
 export const fetchData = createAsyncThunk('SingleProperty/fetchData', async (id) => {
   const response = await axios.post(`${process.env.REACT_APP_NODE_API_URL}singleProperty/${id}`)
   return response.data
 })
-// Define the user slice
+// The property details slice is defined here.
 export const PropertyDetailsSlice = createSlice({
   name: 'ProductDetails',
   initialState: { data: null, loading: false, error: null },

@@ -2,21 +2,21 @@
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Project paths are built inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
+# Quick-start development settings are kept here for local use.
+# The production checklist is documented at https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY WARNING: the secret key used in production remains secret.
 SECRET_KEY = 'django-insecure-@257x$$hqhwc^blgs*hqbb%s$hkbc@&)jt%!-$kepf5m)3v$5w'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: debug mode stays off in production.
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() == 'true'
 
 
-# ALLOWED_HOSTS = []
+# ALLOWED_HOSTS defaults to an empty list here.
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'abharole.in']
 
 
@@ -84,7 +84,7 @@ DATABASES = {
 
 
 # Password validation
-# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
+# The validator reference is documented at https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -103,7 +103,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.0/topics/i18n/
+# The i18n reference is documented at https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -118,7 +118,7 @@ USE_TZ = True
 
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+# The default-auto-field reference is documented at https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

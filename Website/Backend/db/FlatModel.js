@@ -192,7 +192,7 @@ flatSchema.index({ location: 1, BEDROOM_NUM: 1 });
 flatSchema.index({ location: 1, Price_per_sqft: 1 });
 flatSchema.index({ PRICE: 1 });
 
-// Create a model for the flat data
+// The model for the flat data is created here.
 const FlatData = mongoose.model('Flat', flatSchema, 'Flat_Data');
 
 export default FlatData;

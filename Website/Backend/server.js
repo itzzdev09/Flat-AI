@@ -23,40 +23,40 @@ const __dirname = path.dirname(__filename)
 
 dotenv.config({ path: path.join(__dirname, '.env') })
 const app = express()
-// Global middleware that keeps the API simple for the React client.
+// Global middleware keeps the API simple for the React client.
 app.use(cors())
 app.use(bodyParser.json())
 app.use(express.json())
 
-// auth
+// Authentication routes
 app.use('/api/auth', authRoute)
 app.use('/api/admin', adminRoute)
 
-// get search result at home
+// Search results for the home page
 app.use('/api/clientData', ClientDataRoute)
 
-//get all data at home
+// Paginated listing data for the home page
 app.use('/api/allData',allDataRoute )
 
-// getting single property
+// Single-property lookup
 app.use('/api/singleProperty',singlePropertyRoute )
 
-// Getting recommendations in the single-property page
+// Recommendations for the single-property page
 app.use('/api/recommendations', SinglePropertyRecommendationRoute);
 
 
-// Prediction Recommendation
+// Prediction recommendation route
 app.use('/api', PredictionRecommendationRoute);
-// Local prediction endpoint that keeps the website working even if Django is unreachable.
+// The local prediction endpoint keeps the website working even if Django is unreachable.
 app.use('/api/prediction', PredictionRoute);
 
-// all filter data
+// Filtered data endpoint
 app.get('/api/allfilteredData', async (req, res) => {
   
   try {
     const filteredData = await getFilteredFlats();
 
-    // Send the filtered data as JSON response
+    // The filtered data is sent as a JSON response.
     res.status(200).json(filteredData);
        
   } catch (error) {
@@ -71,7 +71,7 @@ app.get('/api/allfilteredData', async (req, res) => {
 
 
 
-// Start the server
+// Server bootstrap
 const PORT = process.env.PORT || 4000
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'admin@flat.ai').toLowerCase().trim()
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'secret12'

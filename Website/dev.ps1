@@ -17,7 +17,7 @@ foreach ($key in @('MONGODB_URI', 'MONGODB_URI_ATLAS', 'MONGO_URI')) {
     }
 }
 
-# Prefer the repo virtualenv so Django starts with the exact dependencies this project needs.
+# The repo virtualenv is preferred so Django starts with the exact dependencies this project needs.
 $pythonExe = Join-Path $PSScriptRoot "..\.venv\Scripts\python.exe"
 if (-not (Test-Path $pythonExe)) {
     $pythonExe = "python"

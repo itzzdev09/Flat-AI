@@ -9,7 +9,7 @@ import 'slick-carousel/slick/slick-theme.css';
 const Recommendation = ({ data }) => {
   const result = Array.isArray(data) ? data : [];
 
-  // Keep the carousel simple so it loads quickly on the prediction page.
+  // The carousel stays simple so it loads quickly on the prediction page.
   const sliderSettings = {
     dots: true,
     infinite: true,

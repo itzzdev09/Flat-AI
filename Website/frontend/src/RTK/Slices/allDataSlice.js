@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 
-// Thunk to fetch paginated data
+// The thunk fetches paginated data.
 export const fetchAllData = createAsyncThunk('allProperty/fetchData', async (page) => {
   const response = await axios.post(`${process.env.REACT_APP_NODE_API_URL}allData/${page}`)
   return response.data
 })
 
-// Slice to handle data fetching, loading, and pagination
+// The slice handles data fetching, loading, and pagination.
 const allDataSlice = createSlice({
   name: 'allData',
   initialState: {
@@ -20,7 +20,7 @@ const allDataSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // fulfilled
+      // Fulfilled state
       .addCase(fetchAllData.fulfilled, (state, action) => {
         const fetchedData = action.payload
 
@@ -37,12 +37,12 @@ const allDataSlice = createSlice({
         state.loading = false
         state.error = null
       })
-      //pending
+      // Pending state
       .addCase(fetchAllData.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      //rejected
+      // Rejected state
       .addCase(fetchAllData.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message
@@ -50,5 +50,5 @@ const allDataSlice = createSlice({
   },
 })
 
-// Export the reducer
+// The reducer is exported here.
 export default allDataSlice.reducer

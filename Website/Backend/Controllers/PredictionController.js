@@ -1,6 +1,6 @@
 import { searchLocalOrMongoFlats } from '../db/localDataStore.js'
 
-// This endpoint keeps the prediction page stable by doing the scoring server-side.
+// The endpoint keeps the prediction page stable by doing the scoring server-side.
 // If Django is available later, the same response shape can still be mirrored there,
 // but the website no longer depends on the browser reaching Django directly.
 const AGE_ALIASES = {
@@ -116,7 +116,7 @@ const similarityScore = (source, target) => {
   return Math.min(score, 1)
 }
 
-// Score nearby flats, then blend their price-per-sqft into a market estimate.
+// Nearby flats are scored, then their price-per-sqft values are blended into a market estimate.
 const estimatePrice = (data, properties) => {
   const source = normalizeQuery(data)
 
@@ -193,7 +193,7 @@ const hydrateRecommendation = (item, score) => ({
   Similarity: `${(score * 100).toFixed(2)}`,
 })
 
-// Reuse the same dataset to return ranked cards beside the prediction.
+// The same dataset is reused to return ranked cards beside the prediction.
 const buildRecommendations = (query, properties, topN = 10) => {
   const source = {
     location: query.location,

@@ -2,17 +2,17 @@ import { findFlatByPropId } from '../db/localDataStore.js'
 
 export const getPropertyRecommendations = async (req, res) => {
   try {
-    // Hydrate the ranked IDs from Django into full property cards for the UI.
+    // The ranked IDs from Django are hydrated into full property cards for the UI.
     const data = Array.isArray(req.body) ? req.body : (req.body ? [req.body] : [])
     const propertyList = []
 
     for (const object of data) {
       const PropertyID = object.PropertyID || object.PROP_ID
 
-      // Find the property in the database based on PropertyID
+      // The property is found in the database based on PropertyID.
       const property = await findFlatByPropId(PropertyID)
 
-      // If the property exists, add the Similarity field
+      // If the property exists, the Similarity field is added.
       if (property) {
         const new_data = {
           _id: property._id,
