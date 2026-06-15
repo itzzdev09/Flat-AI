@@ -15,6 +15,7 @@ export const getMongoUri = () => (
 
 export const connectToDatabase = async () => {
   const mongoUri = getMongoUri();
+  const dbName = process.env.MONGODB_DB_NAME || 'realestate';
 
   if (!mongoUri) {
     throw new Error('MONGODB_URI is not set. MongoDB is required.');
@@ -26,6 +27,7 @@ export const connectToDatabase = async () => {
 
   try {
     const conn = await mongoose.connect(mongoUri, {
+      dbName,
       serverSelectionTimeoutMS: 8000,
       connectTimeoutMS: 8000,
       maxPoolSize: 10,

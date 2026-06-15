@@ -13,6 +13,7 @@ dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
 const dataPath = path.resolve(__dirname, '../../ml/pkl/prediction_df.pkl');
 const mongoUri = getMongoUri();
+const mongoDbName = process.env.MONGODB_DB_NAME || 'realestate';
 
 const loadPropertiesFromPickle = async () => new Promise((resolve, reject) => {
   const python = process.env.PYTHON || 'python';
@@ -53,10 +54,10 @@ const run = async () => {
 
   const properties = await loadPropertiesFromPickle();
 
-  await mongoose.connect(mongoUri);
+  await mongoose.connect(mongoUri, { dbName: mongoDbName });
 
   const collectionName = FlatData.collection.collectionName;
-  console.log(`Connected to ${mongoUri}`);
+  console.log(`Connected to ${mongoUri} (${mongoDbName})`);
   console.log(`Refreshing ${collectionName} with ${properties.length} listings...`);
 
   await FlatData.deleteMany({});

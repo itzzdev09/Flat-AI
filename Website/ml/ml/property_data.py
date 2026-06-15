@@ -8,6 +8,7 @@ from pymongo import MongoClient
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PICKLE_DATA_PATH = os.path.abspath(os.path.join(BASE_DIR, 'pkl', 'prediction_df.pkl'))
 BACKEND_ENV_PATH = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Backend', '.env'))
+MONGODB_DB_NAME = os.getenv('MONGODB_DB_NAME', 'realestate')
 
 
 def _read_backend_env():
@@ -42,10 +43,7 @@ def get_property_data():
         client = None
         try:
             client = MongoClient(mongo_uri, serverSelectionTimeoutMS=2000)
-            database = client.get_default_database()
-            if database is None:
-                db_name = mongo_uri.rsplit('/', 1)[-1].split('?', 1)[0] or 'realestate'
-                database = client[db_name]
+            database = client[MONGODB_DB_NAME]
             data = list(database['Flat_Data'].find({}, {'_id': 0}))
             if data:
                 return data
