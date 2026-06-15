@@ -1,0 +1,295 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { locationSuggestions } from '../../others/Keywords';
+import HistoryTable from './HistoryTable';
+import Recommendation from './Recommendation';
+import { Alert, Button, Col, Form, ListGroup, Row } from 'react-bootstrap';
+import { getStoredAuth } from '../../utils/auth';
+
+const locationOptions = locationSuggestions;
+
+const Predict = () => {
+  const [data, setData] = useState(null);
+  const [location, setLocation] = useState('');
+  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [bedroom, setBedroom] = useState('');
+  const [balcony, setBalcony] = useState('');
+  const [area, setArea] = useState('');
+  const [age, setAge] = useState('');
+  const [furnish, setFurnish] = useState('');
+  const [amenity, setAmenity] = useState('');
+  const [floor, setFloor] = useState('');
+  const [history, setHistory] = useState([]);
+  const [formDataForRecommendation, setFormDataForRecommendation] = useState({});
+  const [predictedData, setPredictedData] = useState();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { token, user } = getStoredAuth();
+  const historyKey = user ? `searchHistory:${user._id}` : 'searchHistory';
+
+  const fetchData = async (sessionId) => {
+    if (!sessionId) return;
+    const response = await axios.get(`${process.env.REACT_APP_DJANGO_API_URL}fetchdata/?session_id=${sessionId}`);
+    setData(response.data);
+  };
+
+  useEffect(() => {
+    if (!token) {
+      setHistory([]);
+      return;
+    }
+
+    const savedHistory = localStorage.getItem(historyKey);
+    if (savedHistory) setHistory(JSON.parse(savedHistory));
+  }, [historyKey, token]);
+
+  const handleLocationChange = (event) => {
+    const value = event.target.value;
+    setLocation(value);
+
+    if (value.length > 0) {
+      setFilteredSuggestions(
+        locationOptions.filter((option) => option.toLowerCase().includes(value.toLowerCase()))
+      );
+      setShowSuggestions(true);
+    } else {
+      setFilteredSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setLocation(suggestion);
+    setFilteredSuggestions([]);
+    setShowSuggestions(false);
+  };
+
+  const formHandler = async (event) => {
+    event.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const query = { location, bedroom, balcony, area, age, furnish, amenity, floor };
+
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_DJANGO_API_URL}submit/`, query);
+      const result = response.data;
+      const recommendationQuery = { ...query, PRICE: result.prediction };
+
+      setFormDataForRecommendation(recommendationQuery);
+      await fetchData(result.session_id);
+
+      if (token) {
+        const updatedHistory = [{ query, prediction: result.prediction }, ...history];
+        setHistory(updatedHistory);
+        localStorage.setItem(historyKey, JSON.stringify(updatedHistory));
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Django prediction API is not responding.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = (index) => {
+    const newHistory = history.filter((_, i) => i !== index);
+    setHistory(newHistory);
+    localStorage.setItem(historyKey, JSON.stringify(newHistory));
+  };
+
+  useEffect(() => {
+    const getSuggestion = async () => {
+      if (!formDataForRecommendation || !formDataForRecommendation.PRICE) return;
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_DJANGO_API_URL}recommend/Prediction-recommendations/`,
+          formDataForRecommendation
+        );
+        setPredictedData(response.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    getSuggestion();
+  }, [formDataForRecommendation]);
+
+  const predictedPrice = data?.prediction;
+  const low = predictedPrice ? Math.max(predictedPrice - 0.13, 0.01) : null;
+  const high = predictedPrice ? predictedPrice + 0.13 : null;
+  const priceRange = predictedPrice
+    ? high > 1
+      ? `${low.toFixed(2)} to ${high.toFixed(2)} Cr`
+      : `${(low * 100).toFixed(2)} to ${(high * 100).toFixed(2)} Lakh`
+    : 'Waiting for query';
+
+  return (
+    <>
+      <section className="page-hero">
+        <div className="eyebrow" style={{ color: 'var(--teal)' }}>Flat AI</div>
+        <h1>Estimate a property price before you shortlist it.</h1>
+
+      </section>
+
+      <section className="section-shell">
+        <Row className="g-4">
+          <Col lg={7}>
+            <div className="form-panel">
+              <div className="section-heading">
+                <div>
+                  <h2>Prediction query</h2>
+                  <p>Use real Kolkata property features for a more reliable estimate.</p>
+                </div>
+              </div>
+
+              {error ? <Alert variant="danger">{error}</Alert> : null}
+
+              <Form onSubmit={formHandler}>
+                <Row className="g-3">
+                  <Col md={6}>
+                    <Form.Label>Location</Form.Label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      value={location}
+                      onChange={handleLocationChange}
+                      placeholder="Type location..."
+                      required
+                    />
+                    {showSuggestions && location && (
+                      <ListGroup className="mt-2">
+                        {filteredSuggestions.slice(0, 8).map((suggestion) => (
+                          <ListGroup.Item key={suggestion} onClick={() => handleSuggestionClick(suggestion)} action>
+                            {suggestion}
+                          </ListGroup.Item>
+                        ))}
+                      </ListGroup>
+                    )}
+                  </Col>
+
+                  <Col md={3}>
+                    <Form.Label>Bedrooms</Form.Label>
+                    <Form.Select value={bedroom} onChange={(e) => setBedroom(e.target.value)} required>
+                      <option value="">Select</option>
+                      {[1, 2, 3, 4, 5, 6].map((value) => <option key={value} value={value}>{value} BHK</option>)}
+                    </Form.Select>
+                  </Col>
+
+                  <Col md={3}>
+                    <Form.Label>Balcony</Form.Label>
+                    <Form.Select value={balcony} onChange={(e) => setBalcony(e.target.value)} required>
+                      <option value="">Select</option>
+                      {[0, 1, 2, 3, 4].map((value) => <option key={value} value={value}>{value}</option>)}
+                    </Form.Select>
+                  </Col>
+
+                  <Col md={4}>
+                    <Form.Label>Built-up area</Form.Label>
+                    <input
+                      className="form-control"
+                      type="number"
+                      value={area}
+                      onChange={(e) => setArea(e.target.value)}
+                      placeholder="Sq.ft."
+                      required
+                    />
+                  </Col>
+
+                  <Col md={4}>
+                    <Form.Label>Age</Form.Label>
+                    <Form.Select value={age} onChange={(e) => setAge(e.target.value)} required>
+                      <option value="">Select</option>
+                      <option value="New Property">New</option>
+                      <option value="Relatively New">Relatively new</option>
+                      <option value="Moderately Old">Moderately old</option>
+                      <option value="Old Property">Old</option>
+                    </Form.Select>
+                  </Col>
+
+                  <Col md={4}>
+                    <Form.Label>Furnishing</Form.Label>
+                    <Form.Select value={furnish} onChange={(e) => setFurnish(e.target.value)} required>
+                      <option value="">Select</option>
+                      <option value="Unfurnished">Unfurnished</option>
+                      <option value="Semi Furnished">Semi furnished</option>
+                      <option value="Luxury furnished">Luxury furnished</option>
+                      <option value="Fully furnished">Fully furnished</option>
+                    </Form.Select>
+                  </Col>
+
+                  <Col md={6}>
+                    <Form.Label>Amenity level</Form.Label>
+                    <Form.Select value={amenity} onChange={(e) => setAmenity(e.target.value)} required>
+                      <option value="">Select</option>
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                    </Form.Select>
+                  </Col>
+
+                  <Col md={6}>
+                    <Form.Label>Floor band</Form.Label>
+                    <Form.Select value={floor} onChange={(e) => setFloor(e.target.value)} required>
+                      <option value="">Select</option>
+                      <option value="Low Floor">Low floor</option>
+                      <option value="Mid Floor">Mid floor</option>
+                      <option value="High Floor">High floor</option>
+                    </Form.Select>
+                  </Col>
+
+                  <Col xs={12}>
+                    <Button type="submit" className="w-100" disabled={loading}>
+                      {loading ? 'Predicting...' : 'Get prediction'}
+                    </Button>
+                  </Col>
+                </Row>
+              </Form>
+            </div>
+          </Col>
+
+          <Col lg={5}>
+            <div className="detail-panel" style={{ minHeight: '100%' }}>
+              <div className="eyebrow">Current estimate</div>
+              <h1 style={{ fontSize: '3rem', lineHeight: 1 }}>{priceRange}</h1>
+              <p style={{ color: 'rgba(255, 255, 255, 0.82)' }}>
+                {predictedPrice
+                  ? 'This range is generated from the Django prediction response and shown with a practical buffer.'
+                  : 'Fill the form to generate an estimate from the ML service.'}
+              </p>
+              <div className="spec-grid mt-4">
+                <div className="spec-tile">
+                  <span>Approx price / sqft</span>
+                  <strong>{predictedPrice && area ? `Rs. ${Math.round((predictedPrice * 10000000) / Number(area))}` : 'N/A'}</strong>
+                </div>
+                <div className="spec-tile">
+                  <span>Location</span>
+                  <strong>{location || 'N/A'}</strong>
+                </div>
+                <div className="spec-tile">
+                  <span>BHK</span>
+                  <strong>{bedroom || 'N/A'}</strong>
+                </div>
+                <div className="spec-tile">
+                  <span>Amenity</span>
+                  <strong>{amenity || 'N/A'}</strong>
+                </div>
+              </div>
+              {!token ? (
+                <div className="analytics-stat mt-4">
+                  <span>Signed out</span>
+                  <strong>History is disabled</strong>
+                  <small>Log in to save prediction history across sessions.</small>
+                </div>
+              ) : null}
+            </div>
+          </Col>
+        </Row>
+      </section>
+
+      <Recommendation data={predictedData} />
+      {token ? <HistoryTable history={history} onDelete={handleDelete} /> : null}
+    </>
+  );
+};
+
+export default Predict;

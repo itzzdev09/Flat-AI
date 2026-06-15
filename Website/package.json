@@ -1,0 +1,13 @@
+{
+  "name": "your-project-name",
+  "version": "1.0.0",
+  "scripts": {
+    "start:backend": "cd Backend && node server.js",
+    "start:frontend": "cd frontend && npm start",
+    "start:ml": "cd ml && python manage.py runserver",
+    "dev": "powershell -ExecutionPolicy Bypass -File dev.ps1"
+  },
+  "devDependencies": {
+    "concurrently": "^7.0.0"
+  }
+}

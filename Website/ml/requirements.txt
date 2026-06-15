@@ -1,0 +1,4 @@
+Django>=4.2,<6
+django-cors-headers>=4.0
+pandas>=2.0
+pymongo>=4.6
