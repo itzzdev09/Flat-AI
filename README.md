@@ -3,8 +3,8 @@
 Flat AI is a property search, analytics, and recommendation platform built as a hybrid stack:
 
 - React frontend for the user interface
-- Node.js/Express backend for app APIs, authentication, and property data
-- Django service for prediction and recommendation logic
+- Node.js/Express backend for app APIs, authentication, property data, and the working prediction endpoint
+- Django service for standalone prediction and recommendation logic
 - MongoDB as the primary database when available
 - Local fallback storage for offline or partially configured development
 
@@ -26,8 +26,8 @@ The product lets a user:
 The overall design is split so each responsibility lives in the right layer:
 
 - The frontend focuses on user experience and state management
-- The Node backend handles request routing, auth, and data access
-- The Django app handles prediction and ranking logic
+- The Node backend handles request routing, auth, data access, and the prediction page flow
+- The Django app remains available as a standalone ML service
 - The data layer decides whether to use MongoDB or local fallback files
 
 ## Big Picture Architecture
@@ -53,19 +53,20 @@ It:
 - serves auth endpoints
 - serves search and listing endpoints
 - serves admin endpoints
-- forwards or hydrates data for recommendation flows
+- serves the prediction route used by the React prediction page
+- hydrates data for recommendation flows
 - connects to MongoDB when possible
 - falls back to local JSON / pickle data when Mongo is unavailable
 
 ### 3. Django ML Service
 
-The Django app is a second backend that focuses on property intelligence.
+The Django app is still part of the repo, but the website no longer depends on the browser reaching Django directly for the prediction page.
 
 It:
 
 - estimates property prices
 - returns similar properties using heuristic scoring
-- keeps prediction logic separate from the main Node API
+- can be run independently for ML experiments or future integration
 
 ### 4. Data Storage
 
@@ -73,6 +74,7 @@ This repo uses more than one data source:
 
 - MongoDB stores properties and users when available
 - `Website/Backend/data/users.json` is the fallback user store when Mongo is not available
+- `Website/Backend/db/localDataStore.js` is the main property fallback used by Node prediction and browsing flows
 - `Website/ml/pkl/prediction_df.pkl` is used as a dataset fallback for ML-related data
 - `Website/ml/db.sqlite3` is Django's local SQLite database
 
@@ -232,9 +234,9 @@ It is used by the property details page so the page can show the selected flat's
 
 #### `Website/frontend/src/RTK/Slices/PredictionRecommendationSlice.js`
 
-This slice fetches recommendation data for the prediction page.
+This slice is the older recommendation hydrator used by the legacy prediction path.
 
-It is used after the ML service produces a price estimate, so the frontend can ask for similar properties based on the predicted profile.
+The current working prediction page gets recommendation cards from the Node backend directly, but this slice is still useful if you want to restore the two-step workflow later.
 
 ### `Website/frontend/src/utils/auth.js`
 
@@ -286,10 +288,10 @@ This page gathers the features needed to predict a property's price.
 It:
 
 - collects location, bedroom count, balcony count, area, age, furnishing, amenities, and floor band
-- sends them to Django
+- sends them to the Node prediction route
 - displays the predicted value
 - fetches prediction history for signed-in users
-- requests recommended homes based on the predicted query
+- requests recommended homes from the same response
 
 #### `AnalysisPage.jsx`
 

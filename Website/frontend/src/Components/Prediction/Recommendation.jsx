@@ -1,24 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Card, Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchData } from '../../RTK/Slices/PredictionRecommendationSlice';
-import Loading from '../../Components/Sections/Loading';
 import Slider from 'react-slick';
 import { getPropertyImage } from '../../utils/propertyUtils';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 const Recommendation = ({ data }) => {
-  const dispatch = useDispatch();
-  const { data: result, loading, error } = useSelector((state) => state.predictionSuggestion);
-
-  useEffect(() => {
-    // Only call the hydrator when the Node API returns ranked property IDs.
-    if (Array.isArray(data) && data.length > 0) {
-      dispatch(fetchData(data));
-    }
-  }, [data, dispatch]);
+  const result = Array.isArray(data) ? data : [];
 
   // Keep the carousel simple so it loads quickly on the prediction page.
   const sliderSettings = {
@@ -35,9 +24,7 @@ const Recommendation = ({ data }) => {
     ],
   };
 
-  if (loading) return <Loading />;
-  if (error) return <p>Error fetching recommendations: {error}</p>;
-  if (!result || result.length === 0) return null;
+  if (result.length === 0) return null;
 
   return (
     <Container className="my-5">

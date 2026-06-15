@@ -17,7 +17,13 @@ foreach ($key in @('MONGODB_URI', 'MONGODB_URI_ATLAS', 'MONGO_URI')) {
     }
 }
 
-$djangoCheck = python -c "import django" 2>$null
+# Prefer the repo virtualenv so Django starts with the exact dependencies this project needs.
+$pythonExe = Join-Path $PSScriptRoot "..\.venv\Scripts\python.exe"
+if (-not (Test-Path $pythonExe)) {
+    $pythonExe = "python"
+}
+
+$djangoCheck = & $pythonExe -c "import django" 2>$null
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Django is not installed for the active Python. Run this first:"
     Write-Host "cd `"$PSScriptRoot\ml`""
@@ -28,7 +34,7 @@ if ($LASTEXITCODE -ne 0) {
 $services = @(
     @{ Name = "backend"; Directory = Join-Path $PSScriptRoot "Backend"; Command = "node server.js"; Environment = $backendEnv },
     @{ Name = "frontend"; Directory = Join-Path $PSScriptRoot "frontend"; Command = "npm start"; Environment = @{} },
-    @{ Name = "ml"; Directory = Join-Path $PSScriptRoot "ml"; Command = "python manage.py runserver"; Environment = $mlEnv }
+    @{ Name = "ml"; Directory = Join-Path $PSScriptRoot "ml"; Command = "`"$pythonExe`" manage.py runserver 0.0.0.0:8000"; Environment = $mlEnv }
 )
 
 $jobs = foreach ($service in $services) {

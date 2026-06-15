@@ -12,6 +12,7 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import SinglePropertyRecommendationRoute from './Routes/SinglePropertyRecommendationRoute.js'
 import PredictionRecommendationRoute from './Routes/PredictionRecommendationRouter.js'
+import PredictionRoute from './Routes/PredictionRoute.js'
 import { getFilteredFlats } from './db/localDataStore.js'
 import { createUser, findUserByEmail } from './db/userStore.js'
 import { hashPassword } from './utils/password.js'
@@ -46,6 +47,8 @@ app.use('/api/recommendations', SinglePropertyRecommendationRoute);
 
 // Prediction Recommendation
 app.use('/api', PredictionRecommendationRoute);
+// Local prediction endpoint that keeps the website working even if Django is unreachable.
+app.use('/api/prediction', PredictionRoute);
 
 // all filter data
 app.get('/api/allfilteredData', async (req, res) => {

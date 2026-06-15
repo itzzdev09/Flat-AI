@@ -22,7 +22,6 @@ const Predict = () => {
   const [amenity, setAmenity] = useState('');
   const [floor, setFloor] = useState('');
   const [history, setHistory] = useState([]);
-  const [formDataForRecommendation, setFormDataForRecommendation] = useState({});
   const [predictedData, setPredictedData] = useState();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -69,15 +68,13 @@ const Predict = () => {
     const query = { location, bedroom, balcony, area, age, furnish, amenity, floor };
 
     try {
-      // One request returns the prediction immediately, so the UI stays responsive.
-      const response = await axios.post(`${process.env.REACT_APP_DJANGO_API_URL}submit/`, query);
+      // One backend request now returns both the prediction and the ranked recommendations.
+      const response = await axios.post(`${process.env.REACT_APP_NODE_API_URL}prediction/submit`, query);
       const result = response.data;
       const predictionPayload = { prediction: result.prediction };
-      const recommendationQuery = { ...query, PRICE: result.prediction };
 
       setData(predictionPayload);
-      setPredictedData(null);
-      setFormDataForRecommendation(recommendationQuery);
+      setPredictedData(Array.isArray(result.recommendations) ? result.recommendations : []);
 
       if (token) {
         const updatedHistory = [{ query, prediction: result.prediction }, ...history];
@@ -96,23 +93,6 @@ const Predict = () => {
     setHistory(newHistory);
     localStorage.setItem(historyKey, JSON.stringify(newHistory));
   };
-
-  useEffect(() => {
-    const getSuggestion = async () => {
-      if (!formDataForRecommendation || !formDataForRecommendation.PRICE) return;
-      try {
-        // Recommendation is a second step that ranks similar homes for the predicted price.
-        const response = await axios.post(
-          `${process.env.REACT_APP_DJANGO_API_URL}recommend/Prediction-recommendations/`,
-          formDataForRecommendation
-        );
-        setPredictedData(response.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    getSuggestion();
-  }, [formDataForRecommendation]);
 
   const predictedPrice = Number(data?.prediction) || 0;
   const priceRange = predictedPrice ? formatPredictionRange(predictedPrice) : 'Waiting for query';
