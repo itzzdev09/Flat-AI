@@ -22,11 +22,11 @@ const Recommendation = ({ data }) => {
   const sliderSettings = {
     dots: true,
     infinite: true,
-    speed: 1200,
+    speed: 700,
     slidesToShow: 4,
     slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 2600,
+    autoplay: false,
+    lazyLoad: 'ondemand',
     responsive: [
       { breakpoint: 1024, settings: { slidesToShow: 2, slidesToScroll: 1 } },
       { breakpoint: 768, settings: { slidesToShow: 1, slidesToScroll: 1 } },
@@ -55,6 +55,8 @@ const Recommendation = ({ data }) => {
                 src={getPropertyImage(item)}
                 alt={`${item.LISTING_TITLE || item.SOCIETY_NAME || 'Property'} image`}
                 style={{ height: '200px', objectFit: 'cover' }}
+                loading="lazy"
+                decoding="async"
               />
               <Card.Body>
                 <Card.Title>{item.LISTING_TITLE || item.SOCIETY_NAME}</Card.Title>

@@ -35,7 +35,13 @@ const PropertyCard = ({ flat }) => {
   return (
     <article className="property-card">
       <div className="property-card-row">
-        <img className="property-image" src={getPropertyImage(flat)} alt={`${flat.LISTING_TITLE || flat.SOCIETY_NAME}, ${flat.CITY}`} />
+        <img
+          className="property-image"
+          src={getPropertyImage(flat)}
+          alt={`${flat.LISTING_TITLE || flat.SOCIETY_NAME}, ${flat.CITY}`}
+          loading="lazy"
+          decoding="async"
+        />
         <div className="property-body">
           <div className="property-card-header">
             <div className="property-card-kicker">

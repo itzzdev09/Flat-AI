@@ -47,7 +47,13 @@ const SearchResult = () => {
         {data.result.map((flat) => (
           <article className="property-card" key={flat._id}>
             <div className="property-card-row">
-              <img className="property-image" src={getPropertyImage(flat)} alt={`${flat.LISTING_TITLE || flat.SOCIETY_NAME}, ${flat.CITY}`} />
+              <img
+                className="property-image"
+                src={getPropertyImage(flat)}
+                alt={`${flat.LISTING_TITLE || flat.SOCIETY_NAME}, ${flat.CITY}`}
+                loading="lazy"
+                decoding="async"
+              />
               <div className="property-body">
                 <div className="d-flex justify-content-between gap-3">
                   <div>

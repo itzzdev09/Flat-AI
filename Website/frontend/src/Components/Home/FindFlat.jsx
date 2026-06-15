@@ -12,8 +12,6 @@ import { useDispatch } from 'react-redux';
 import { resetSearchResults, searchFlatSlice } from '../../RTK/Slices/SearchSlice';
 import { getLocationSuggestions } from '../../utils/propertyUtils';
 
-const BHK_OPTIONS = [1, 2, 3, 4, 5, 6];
-const PROPERTY_OPTIONS = ['Flat/Apartment', 'Farm House', 'House/Villa', 'Residential Land'];
 const FindFlat = () => {
   const locationOptions = locationSuggestions;
   const [location, setLocation] = useState('');
