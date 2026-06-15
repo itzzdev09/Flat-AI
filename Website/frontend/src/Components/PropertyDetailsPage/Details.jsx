@@ -150,7 +150,7 @@ const Details = () => {
       <section className="section-shell">
         <div className="section-heading">
           <div>
-            <h2>Neighbourhood access</h2>
+            <h2>Neighborhood access</h2>
             <p>Nearby services and conveniences generated with the property dataset.</p>
           </div>
         </div>

@@ -508,7 +508,7 @@ Returns paginated property data for the infinite-scroll list.
 
 Returns one property record by ID for the details page.
 
-#### `Website/Backend/Controllers/SinglePropertyRecomendationController.js`
+#### `Website/Backend/Controllers/SinglePropertyRecommendationController.js`
 
 Accepts a list of property IDs and returns the matching records.
 
@@ -766,3 +766,640 @@ If they ask "what happens when MongoDB is down?", answer:
 - Plotly source-map warnings were fixed by upgrading the Plotly packages.
 - The repo is Windows-friendly and includes a `dev.ps1` orchestration script.
 
+## Core Concepts In Plain English
+
+This section is the "teach me the stack from zero" version. If a senior developer asks you what each piece does, these are the mental models to use.
+
+### React
+
+React is the UI library that builds the browser interface out of components.
+
+Think of a component as a reusable piece of UI that:
+
+- receives input through `props`
+- keeps local state with hooks like `useState`
+- reacts to lifecycle-like changes with hooks like `useEffect`
+- returns JSX, which looks like HTML but is really JavaScript syntax
+
+In this repo, React is used to build pages like the home screen, profile screen, admin dashboard, prediction form, and analysis charts.
+
+### JSX
+
+JSX is the syntax React uses to describe UI.
+
+It lets you write markup-like code inside JavaScript so that the render logic stays close to the data logic. For example:
+
+- a page can show a loading screen while data is being fetched
+- once data arrives, the same page can render cards, charts, or forms
+
+### Props
+
+Props are inputs passed from one component to another.
+
+They are how the parent component tells a child component what to display or how to behave.
+
+Example in this app:
+
+- `AnalysisPage` passes filtered property data into chart components
+- `SuggestedProperty` passes `id` into the recommendation widget
+- `HistoryTable` receives a history list and delete handler
+
+### State
+
+State is data that belongs to a component or a global store and can change over time.
+
+There are two levels of state in this app:
+
+- local component state, such as form fields and loading flags
+- global Redux state, such as search results and paginated property data
+
+### Hooks
+
+Hooks are React functions that let function components use state and side effects.
+
+The common ones in this app are:
+
+- `useState` for form values, loading flags, and errors
+- `useEffect` for API calls and startup logic
+- `useMemo` for derived values like filtered analytics data
+- `useSelector` and `useDispatch` for Redux integration
+
+### Redux
+
+Redux is a centralized state management pattern.
+
+Without Redux, each component would have to own and share data manually. That becomes messy when many pages need the same data.
+
+Redux solves that by giving you a single store for app-wide state.
+
+In this repo, Redux is a good fit for:
+
+- search results shown on the home page
+- infinite-scroll listing data
+- property details
+- prediction recommendation output
+
+The flow is usually:
+
+1. A UI component dispatches an action.
+2. A thunk performs an async request.
+3. The Redux slice updates loading/data/error state.
+4. Another component reads that state and renders the result.
+
+### Redux Toolkit
+
+Redux Toolkit is the modern, recommended way to use Redux.
+
+It reduces boilerplate and gives you helpers like:
+
+- `createSlice` for state + reducers
+- `createAsyncThunk` for async API calls
+- `configureStore` for store setup
+
+That is why the Redux code in this repo is compact and easier to read than classic Redux.
+
+### Thunks
+
+A thunk is an async function used by Redux to handle API calls.
+
+The async thunks in this repo fetch:
+
+- all listings
+- filtered search results
+- one property by ID
+- prediction recommendation data
+
+### Axios
+
+Axios is the HTTP client used for talking to APIs.
+
+Why it matters here:
+
+- it sends JSON cleanly
+- it automatically parses JSON responses
+- it lets us attach auth headers
+- it gives friendly error objects for UI messages
+
+### JWT
+
+JWT means JSON Web Token.
+
+It is a signed string that proves the user is logged in.
+
+This app uses JWT so the backend can stay stateless:
+
+- login returns a token
+- frontend stores it in localStorage
+- protected routes send it in the `Authorization` header
+- backend middleware verifies it on every request
+
+### localStorage
+
+localStorage is the browser's simple key-value storage.
+
+In this app it stores:
+
+- auth token
+- user info
+- session metadata
+- wishlist data
+- prediction history
+
+This makes the experience persistent across refreshes.
+
+### Node.js and Express
+
+Node.js lets JavaScript run on the server.
+
+Express is the web framework sitting on top of Node.
+
+Together they provide:
+
+- routing
+- middleware
+- request/response handling
+- auth and admin APIs
+- data hydration for frontend needs
+
+### Middleware
+
+Middleware is logic that runs before a route handler finishes.
+
+In this project, middleware is used for:
+
+- protecting authenticated routes
+- checking admin permissions
+- parsing JSON bodies
+- enabling CORS
+
+### MongoDB and Mongoose
+
+MongoDB stores data as documents rather than rows and columns.
+
+Mongoose is the library that gives structure to MongoDB records.
+
+Why Mongoose matters:
+
+- it defines schemas for users and properties
+- it validates fields
+- it makes querying easier
+- it gives the app a consistent model layer
+
+### Django
+
+Django is the Python web framework used here for the ML service.
+
+It is responsible for:
+
+- turning form input into a prediction
+- scoring property similarity
+- exposing those results through API endpoints
+
+### URL Routing in Django
+
+Django routes requests by matching paths in `urls.py`.
+
+That means:
+
+- `submit/` goes to the prediction function
+- `fetchdata/` returns the stored prediction
+- recommendation endpoints go to the recommendation logic
+
+### CORS
+
+CORS stands for Cross-Origin Resource Sharing.
+
+It is the browser security rule that decides whether one origin is allowed to call another.
+
+This matters because:
+
+- the React app runs on one port/origin in development
+- the Node backend runs on another
+- the Django service runs on another
+
+The backend and Django service both need CORS configured so the frontend can call them.
+
+### Fallback Data
+
+This app is designed to keep working even when the ideal database is not present.
+
+There are fallback layers for:
+
+- users
+- property listings
+- analytics data
+- ML recommendation input
+
+That means the repo is more forgiving during development and demonstration.
+
+## File-by-File Walkthrough
+
+This is the "what does every important file actually do?" section.
+
+### Root Files
+
+#### `README.md`
+
+This documentation file explains the system architecture, concepts, request flow, and file responsibilities.
+
+#### `Website/dev.ps1`
+
+This PowerShell script starts the backend, frontend, and Django service together on Windows.
+
+It also passes relevant Mongo env values into the Django process so the services can share the same configuration when needed.
+
+#### `.gitignore`
+
+This file prevents secrets, dependencies, generated builds, and local databases from being committed.
+
+### Frontend Entry and Layout
+
+#### `Website/frontend/src/index.js`
+
+Bootstraps the app into the DOM and wraps it in Redux and React Router providers.
+
+#### `Website/frontend/src/App.jsx`
+
+Defines application routes and renders the persistent layout shell.
+
+#### `Website/frontend/src/CSS/index.css`
+
+Global styling for the app.
+
+#### `Website/frontend/src/CSS/App.css`
+
+Application-specific styling for the overall visual theme and layout.
+
+### Frontend Pages
+
+#### `Website/frontend/src/Pages/Home.jsx`
+
+Composes the home page sections: poster, search form, search results, and property feed.
+
+#### `Website/frontend/src/Pages/Prediction.jsx`
+
+Wraps the prediction component in a dedicated page route.
+
+#### `Website/frontend/src/Pages/AnalysisPage.jsx`
+
+Loads filtered data and feeds it into analytics charts.
+
+#### `Website/frontend/src/Pages/Auth.jsx`
+
+Handles sign up and login.
+
+It validates form input, calls the Node auth API, stores the returned JWT session, and redirects based on role.
+
+#### `Website/frontend/src/Pages/Profile.jsx`
+
+Loads and updates the logged-in user's profile and password.
+
+#### `Website/frontend/src/Pages/Admin.jsx`
+
+Provides admin summary cards, user role control, property CRUD, and data refresh actions.
+
+#### `Website/frontend/src/Pages/PropertyDetailsPage.jsx`
+
+Shows the single-property detail screen and likely combines the property data, image, and suggested properties.
+
+#### `Website/frontend/src/Pages/WishList.jsx`
+
+Renders saved properties from localStorage for the current signed-in user.
+
+### Frontend Components
+
+#### `Website/frontend/src/Components/Sections/Navbar.jsx`
+
+The global navigation bar.
+
+It likely links between the main pages and adapts based on auth state.
+
+#### `Website/frontend/src/Components/Sections/Footer.jsx`
+
+The global footer.
+
+#### `Website/frontend/src/Components/Sections/Loading.jsx`
+
+A reusable loading indicator shown while data is being fetched.
+
+#### `Website/frontend/src/Components/Home/Poster.jsx`
+
+The homepage hero section.
+
+It sets the first visual impression and frames the app's search workflow.
+
+#### `Website/frontend/src/Components/Home/FindFlat.jsx`
+
+The search form for home-page property lookup.
+
+It handles location suggestions, bedroom count, property type, and form submission.
+
+#### `Website/frontend/src/Components/Home/SearchResult.jsx`
+
+Displays filtered search results returned from the Node API.
+
+It also adds wishlist support.
+
+#### `Website/frontend/src/Components/Home/AllFlats.jsx`
+
+Displays the main paginated property feed.
+
+It implements infinite scroll by asking Redux for the next page when the user nears the bottom.
+
+#### `Website/frontend/src/Components/Prediction/Prediction.jsx`
+
+The main ML prediction form.
+
+It:
+
+- collects property features
+- sends them to Django
+- shows the predicted price
+- fetches prediction-based recommendations
+- stores per-user history in localStorage
+
+#### `Website/frontend/src/Components/Prediction/HistoryTable.jsx`
+
+Shows previous prediction queries for the current user.
+
+#### `Website/frontend/src/Components/Prediction/Recommendation.jsx`
+
+Shows recommendation results after prediction.
+
+#### `Website/frontend/src/Components/PropertyDetailsPage/Details.jsx`
+
+Shows the main body of the property details page.
+
+#### `Website/frontend/src/Components/PropertyDetailsPage/SuggestedProperty.jsx`
+
+Shows similar properties.
+
+It combines Django similarity ranking with Node data hydration.
+
+#### `Website/frontend/src/Components/Analysis/*`
+
+These are the visualization components that turn data into charts and insights.
+
+Examples:
+
+- bar plot
+- box plot
+- histogram
+- heatmap
+- pie chart
+- scatter plot
+- insight cards
+
+### Frontend State and Utilities
+
+#### `Website/frontend/src/RTK/store.js`
+
+Creates the Redux store and registers each slice reducer.
+
+#### `Website/frontend/src/RTK/Slices/SearchSlice.js`
+
+Manages search API calls and state.
+
+#### `Website/frontend/src/RTK/Slices/allDataSlice.js`
+
+Manages paginated listing state.
+
+#### `Website/frontend/src/RTK/Slices/PropertyDetailsSlice.js`
+
+Manages one-property detail fetches.
+
+#### `Website/frontend/src/RTK/Slices/PredictionRecommendationSlice.js`
+
+Manages recommendation fetches for predicted properties.
+
+#### `Website/frontend/src/utils/auth.js`
+
+Manages persistent auth state in localStorage.
+
+#### `Website/frontend/src/utils/propertyUtils.js`
+
+Contains helpers for property images, location aliasing, and display-friendly normalization.
+
+#### `Website/frontend/src/others/Keywords.js`
+
+Provides location keyword lists used for suggestion UIs.
+
+### Backend Entry and Routing
+
+#### `Website/Backend/server.js`
+
+The main Express app.
+
+It loads env vars, configures middleware, mounts routes, starts MongoDB when available, and starts the server.
+
+#### `Website/Backend/Routes/authRoute.js`
+
+Auth endpoints for signup, login, profile lookup, profile update, and password change.
+
+#### `Website/Backend/Routes/adminRoute.js`
+
+Admin-only endpoints for summary, users, role updates, and property CRUD.
+
+#### `Website/Backend/Routes/ClientDataRoute.js`
+
+Search endpoint used by the homepage search form.
+
+#### `Website/Backend/Routes/allDataRoute.js`
+
+Paginated property feed endpoint.
+
+#### `Website/Backend/Routes/singlePropertyRoute.js`
+
+Fetches one property by ID.
+
+#### `Website/Backend/Routes/SinglePropertyRecommendationRoute.js`
+
+Hydrates a list of property IDs into full property documents.
+
+#### `Website/Backend/Routes/PredictionRecommendationRouter.js`
+
+Receives prediction-based recommendation requests.
+
+### Backend Controllers
+
+#### `Website/Backend/Controllers/authController.js`
+
+Implements the authentication and profile logic.
+
+It validates input, creates users, checks passwords, signs JWTs, updates profile fields, and changes passwords.
+
+#### `Website/Backend/Controllers/adminController.js`
+
+Implements the admin dashboard behavior.
+
+It returns summaries, lists users, changes roles, and manages properties.
+
+#### `Website/Backend/Controllers/searchController.js`
+
+Turns search form input into a database query and returns matching flats.
+
+#### `Website/Backend/Controllers/allDataController.js`
+
+Fetches one paginated chunk of properties.
+
+#### `Website/Backend/Controllers/singlePropertyController.js`
+
+Fetches a single property by ID.
+
+#### `Website/Backend/Controllers/SinglePropertyRecommendationController.js`
+
+Accepts property IDs and returns the matching full property objects.
+
+#### `Website/Backend/Controllers/PredictionRecommendationController.js`
+
+Accepts a list of candidate IDs and returns details plus similarity metadata.
+
+### Backend Database and Fallback Layers
+
+#### `Website/Backend/db/db.js`
+
+Reads the MongoDB URI from env and opens the Mongoose connection.
+
+#### `Website/Backend/db/FlatModel.js`
+
+Defines the schema for property documents.
+
+#### `Website/Backend/db/UserModel.js`
+
+Defines the schema for user documents.
+
+#### `Website/Backend/db/userStore.js`
+
+Abstracts user storage so the app can use Mongo or a local JSON file.
+
+#### `Website/Backend/db/localDataStore.js`
+
+Abstracts property data access and fallback behavior.
+
+It is responsible for:
+
+- pagination
+- filtering
+- lookup by ID
+- lookup by `PROP_ID`
+- filtered analytics output
+
+#### `Website/Backend/data/users.json`
+
+The fallback local user store written when MongoDB is unavailable.
+
+### Backend Middleware
+
+#### `Website/Backend/Middleware/authMiddleware.js`
+
+Verifies JWTs and loads the authenticated user into the request.
+
+#### `Website/Backend/Middleware/adminMiddleware.js`
+
+Blocks access unless the authenticated user has the admin role.
+
+### Backend Utilities
+
+#### `Website/Backend/utils/password.js`
+
+Hashes and verifies passwords.
+
+#### `Website/Backend/utils/jwt.js`
+
+Signs tokens and validates them.
+
+#### `Website/Backend/utils/validation.js`
+
+Validates auth and profile payloads before they reach the database layer.
+
+#### `Website/Backend/utils/location.js`
+
+Normalizes location names and helps the search logic treat aliases as the same place.
+
+### Django Files
+
+#### `Website/ml/manage.py`
+
+Standard Django command runner.
+
+#### `Website/ml/ml/settings.py`
+
+Configures installed apps, middleware, database location, and CORS.
+
+#### `Website/ml/ml/urls.py`
+
+Connects Django URL paths to the two feature apps.
+
+#### `Website/ml/prediction/views.py`
+
+Implements price prediction logic.
+
+#### `Website/ml/Recommendation/views.py`
+
+Implements similarity ranking logic.
+
+#### `Website/ml/ml/property_data.py`
+
+Provides the data source used by the Django services.
+
+#### `Website/ml/pkl/prediction_df.pkl`
+
+The fallback data file used when the app needs local prediction/analysis rows.
+
+#### `Website/ml/db.sqlite3`
+
+Django's local SQLite database used for the Python side of the project.
+
+## Request Lifecycle At A Glance
+
+### Example: Search a flat
+
+1. User types location and filters into the home page search form.
+2. `FindFlat.jsx` dispatches a Redux thunk.
+3. The thunk sends a request to `POST /api/clientData`.
+4. Node validates the payload and builds a query.
+5. `localDataStore.js` checks Mongo first, then fallback data.
+6. The response comes back as a list of flats.
+7. React shows the matching cards.
+
+### Example: Save a property
+
+1. User clicks the heart icon.
+2. Frontend checks whether the user is signed in.
+3. The property is stored in localStorage under a user-specific wishlist key.
+4. The UI updates instantly without a server round-trip.
+
+### Example: Predict a price
+
+1. User enters property features on the prediction page.
+2. React sends the feature payload to Django.
+3. Django normalizes the values.
+4. Django finds comparable properties in the dataset.
+5. Django calculates a weighted predicted price.
+6. React displays the value and fetches similar recommendations.
+
+### Example: Admin changes a user role
+
+1. Admin opens the dashboard.
+2. React sends a request with the JWT auth header.
+3. Node verifies the token and admin role.
+4. Backend updates the user role in the database or fallback store.
+5. The dashboard refreshes the user list.
+
+## What To Say If Someone Asks "Why This Design?"
+
+- React gives a responsive, component-based UI.
+- Redux keeps async app state predictable across many pages.
+- Axios keeps API calls clean and consistent.
+- Node/Express is ideal for auth, CRUD, and app orchestration.
+- Django is isolated for the ML-style logic so prediction code does not clutter the main app API.
+- MongoDB is the primary persistent store, but the fallback layer keeps the project runnable in more environments.
+
+## If You Want To Go Even Further
+
+The next things worth documenting would be:
+
+1. a sequence diagram for each request flow
+2. a database schema map for Mongo, JSON, and SQLite
+3. a "how to run locally" setup section with exact env values
+4. a "common interview questions" appendix

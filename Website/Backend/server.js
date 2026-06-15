@@ -10,7 +10,7 @@ import adminRoute from './Routes/adminRoute.js'
 import { connectToDatabase } from './db/db.js'
 import cors from 'cors'
 import bodyParser from 'body-parser'
-import SinglePropertyRecomendationRoute from './Routes/SinglePropertyRecomendationRoute.js'
+import SinglePropertyRecommendationRoute from './Routes/SinglePropertyRecommendationRoute.js'
 import PredictionRecommendationRoute from './Routes/PredictionRecommendationRouter.js'
 import { getFilteredFlats } from './db/localDataStore.js'
 import { createUser, findUserByEmail } from './db/userStore.js'
@@ -42,8 +42,8 @@ app.use('/api/allData',allDataRoute )
 // getting single property
 app.use('/api/singleProperty',singlePropertyRoute )
 
-// Getting Recommmendation in single property page 
-app.use('/api/recommendations', SinglePropertyRecomendationRoute);
+// Getting recommendations in the single-property page
+app.use('/api/recommendations', SinglePropertyRecommendationRoute);
 
 
 // Prediction Recommendation

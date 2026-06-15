@@ -1,6 +1,6 @@
 
 import express from 'express'
-import { Recommendation } from '../Controllers/SinglePropertyRecomendationController.js';
+import { Recommendation } from '../Controllers/SinglePropertyRecommendationController.js';
 
 const router = express.Router()
 

@@ -1,12 +1,9 @@
 import React from 'react';
 import { Button, Table } from 'react-bootstrap';
+import { formatPredictionRange, formatImpliedPricePerSqft } from './predictionFormatting';
 
 const formatPrediction = (prediction) => {
-  const low = Math.max(prediction - 0.13, 0.01);
-  const high = prediction + 0.13;
-  return high > 1
-    ? `${low.toFixed(2)} to ${high.toFixed(2)} Cr`
-    : `${(low * 100).toFixed(2)} to ${(high * 100).toFixed(2)} Lakh`;
+  return formatPredictionRange(prediction);
 };
 
 const HistoryTable = ({ history, onDelete }) => {
@@ -48,7 +45,7 @@ const HistoryTable = ({ history, onDelete }) => {
                 <td>{entry.query.amenity}</td>
                 <td>{entry.query.floor}</td>
                 <td><strong>{formatPrediction(entry.prediction)}</strong></td>
-                <td>Rs. {((entry.prediction * 10000000) / entry.query.area).toFixed(2)}</td>
+                <td>{formatImpliedPricePerSqft(entry.prediction, entry.query.area)}</td>
                 <td>
                   <Button onClick={() => onDelete(index)} aria-label="Delete history row">
                     <i className="fa-solid fa-trash"></i>
@@ -59,7 +56,7 @@ const HistoryTable = ({ history, onDelete }) => {
           </tbody>
         </Table>
         <p className="property-meta mb-0">
-          Predictions are directional estimates and may drift on unusual inputs.
+          Price ranges are market-style estimates and may vary on unusual inputs.
         </p>
       </div>
     </section>

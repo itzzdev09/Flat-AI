@@ -79,7 +79,7 @@ const toProjectLabel = (value = '') => {
 
 const buildListingTitle = (item) => {
   const bedrooms = item.BEDROOM_NUM ? `${item.BEDROOM_NUM} BHK` : null;
-  const propertyType = item.PROPERTY_TYPE || 'Home';
+  const propertyType = 'Local Flat';
   const area = item.AREA ? `${item.AREA} sqft` : null;
   const location = item.location ? `in ${item.location}` : null;
 
@@ -90,7 +90,7 @@ const normalizeFlat = (item, index = 0) => ({
   ...item,
   _id: item._id || item.PROP_ID || String(index + 1),
   SOCIETY_NAME: toTitleCase(item.SOCIETY_NAME),
-  PROPERTY_TYPE: toTitleCase(item.PROPERTY_TYPE),
+  PROPERTY_TYPE: 'Local Flat',
   CITY: toTitleCase(item.CITY),
   location: toTitleCase(item.location),
   PROJECT_LABEL: toProjectLabel(item.SOCIETY_NAME),
@@ -120,6 +120,25 @@ const dedupeFlats = (items) => {
   });
 };
 
+const matchesArrayFilter = (value, filterValue) => {
+  if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
+  return filterValue.some((item) => String(item) === String(value));
+};
+
+const matchesPropertyTypeFilter = (value, filterValue) => {
+  if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
+  const normalizedValue = String(value || '').toLowerCase();
+  return filterValue.some((item) => normalizedValue === String(item).toLowerCase());
+};
+
+export const getTotalFlatsCount = async () => {
+  if (isMongoReady()) {
+    return await FlatData.countDocuments();
+  }
+  const fallbackData = await loadFallbackFlatData();
+  return fallbackData.length;
+};
+
 export const getPagedFlats = async (page = 1, limit = 2) => {
   const startIndex = (page - 1) * limit;
   if (isMongoReady()) {
@@ -136,6 +155,14 @@ export const searchLocalOrMongoFlats = async (query) => {
     const mongoQuery = { ...query };
     delete mongoQuery.location;
 
+    if (Array.isArray(mongoQuery.BEDROOM_NUM)) {
+      mongoQuery.BEDROOM_NUM = { $in: mongoQuery.BEDROOM_NUM };
+    }
+
+    if (Array.isArray(mongoQuery.PROPERTY_TYPE)) {
+      mongoQuery.PROPERTY_TYPE = { $in: mongoQuery.PROPERTY_TYPE };
+    }
+
     const results = (await FlatData.find(mongoQuery).lean()).map((item, index) => finalizeFlat(normalizeFlat(item, index)));
 
     if (!query.location) {
@@ -147,8 +174,8 @@ export const searchLocalOrMongoFlats = async (query) => {
 
   const fallbackData = await loadFallbackFlatData();
   const filtered = fallbackData.filter((item) => (
-    (!query.BEDROOM_NUM || String(item.BEDROOM_NUM) === String(query.BEDROOM_NUM))
-    && (!query.PROPERTY_TYPE || String(item.PROPERTY_TYPE).toLowerCase() === String(query.PROPERTY_TYPE).toLowerCase())
+    matchesArrayFilter(item.BEDROOM_NUM, query.BEDROOM_NUM)
+    && matchesPropertyTypeFilter(item.PROPERTY_TYPE, query.PROPERTY_TYPE)
     && (!query.location || matchesLocationQuery(item.location, query.location))
   ));
   return dedupeFlats(filtered);

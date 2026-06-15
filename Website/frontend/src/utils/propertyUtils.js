@@ -19,14 +19,16 @@ const LOCATION_ALIASES = {
   'action area 3': 'new town',
 };
 
-const INTERIOR_FALLBACK_IMAGES = [
-  'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?auto=format&fit=crop&w=1200&q=80',
+const LOCAL_IMAGES = [
+  'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1598977123418-45f04b615e07?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1558431382-27e303142255?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1606149059549-6042addafc5a?auto=format&fit=crop&w=1200&q=80'
 ];
-
-const INVALID_IMAGE_PATTERNS = [/via\.placeholder\.com/i];
 
 export const normalizeLocationKey = (value = '') => {
   const normalized = String(value)
@@ -100,13 +102,32 @@ const stringToIndex = (value = '') => (
 );
 
 export const getFallbackPropertyImage = (flat = {}) => {
+  const location = String(flat.location || '').toLowerCase();
+
+  if (location.includes('garia')) {
+    return LOCAL_IMAGES[0];
+  } else if (location.includes('alipore')) {
+    return LOCAL_IMAGES[1];
+  } else if (location.includes('new town') || location.includes('newtown') || location.includes('action area')) {
+    return LOCAL_IMAGES[2];
+  } else if (location.includes('rajarhat')) {
+    return LOCAL_IMAGES[3];
+  }
+
   const seed = flat._id || flat.PROP_ID || flat.location || flat.SOCIETY_NAME || '';
-  return INTERIOR_FALLBACK_IMAGES[stringToIndex(seed) % INTERIOR_FALLBACK_IMAGES.length];
+  return LOCAL_IMAGES[stringToIndex(seed) % LOCAL_IMAGES.length];
 };
 
 export const getPropertyImage = (flat = {}) => {
   const image = String(flat.Image || '').trim();
-  if (!image) return getFallbackPropertyImage(flat);
-  if (INVALID_IMAGE_PATTERNS.some((pattern) => pattern.test(image))) return getFallbackPropertyImage(flat);
-  return image;
+  if (image && !/via\.placeholder\.com/i.test(image) && !/pixabay\.com/i.test(image)) {
+    return image;
+  }
+
+  const seed = flat._id || flat.PROP_ID || flat.location || flat.SOCIETY_NAME || '';
+  const images = [
+    'https://cdn.pixabay.com/photo/2017/06/16/13/40/new-home-2409165_960_720.jpg',
+    'https://cdn.pixabay.com/photo/2015/09/27/22/36/house-961401_1280.jpg'
+  ];
+  return images[stringToIndex(seed) % images.length];
 };

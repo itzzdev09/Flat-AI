@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchData } from '../../RTK/Slices/PredictionRecommendationSlice';
 import Loading from '../../Components/Sections/Loading';
 import Slider from 'react-slick';
+import { getPropertyImage } from '../../utils/propertyUtils';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -51,7 +52,7 @@ const Recommendation = ({ data }) => {
             <Card className="property-card" style={{ margin: '10px' }}>
               <Card.Img
                 variant="top"
-                src={item.Image || 'https://via.placeholder.com/300x200'}
+                src={getPropertyImage(item)}
                 alt={`${item.LISTING_TITLE || item.SOCIETY_NAME || 'Property'} image`}
                 style={{ height: '200px', objectFit: 'cover' }}
               />

@@ -32,12 +32,13 @@ const SearchResult = () => {
   };
 
   if (!data || !Array.isArray(data.result) || data.result.length === 0) return null;
+  const headingLabel = data.result[0].location ? `Search results for ${data.result[0].location}` : 'Search results';
 
   return (
     <section className="section-shell">
       <div className="section-heading">
         <div>
-          <h2>Search results for {data.result[0].location}</h2>
+          <h2>{headingLabel}</h2>
           <p>{data.result.length} matching properties found.</p>
         </div>
       </div>

@@ -1,29 +1,30 @@
 
 import { searchLocalOrMongoFlats } from '../db/localDataStore.js';
 
+const PROPERTY_TYPE_MAP = {
+  'Flat/Apartment': 'Flat',
+  'Farm House': 'Farm House',
+  'House/Villa': 'House/Villa',
+  'Residential Land': 'Residential Land',
+};
+
+const toArray = (value) => {
+  if (Array.isArray(value)) return value.filter(Boolean);
+  if (value === undefined || value === null || value === '') return [];
+  return [value];
+};
+
+const normalizeBedrooms = (value) => toArray(value)
+  .map((item) => Number(item))
+  .filter((item) => Number.isFinite(item) && item > 0);
+
+const normalizePropertyTypes = (value) => toArray(value)
+  .map((item) => PROPERTY_TYPE_MAP[item] || item)
+  .filter(Boolean);
 
 // Filtered data based on client query
 export const searchFlats = async (req, res) => {
   const { location, bedroom, property } = req.body;
-
-  let propertyType;
-
-  switch (property) {
-    case 'Flat/Apartment':
-      propertyType = 'Flat';
-      break;
-    case 'Farm House':
-      propertyType = 'Farm House';
-      break;
-    case 'House/Villa':
-      propertyType = 'House/Villa';
-      break;
-    case 'Residential Land':
-      propertyType = 'Residential Land';
-      break;
-    default:
-      propertyType = null;
-  }
 
   // Build the query object based on provided filters
   const query = {};
@@ -32,12 +33,14 @@ export const searchFlats = async (req, res) => {
     query.location = location;
   }
   
-  if (bedroom) {
-    query.BEDROOM_NUM = bedroom;
+  const bedroomValues = normalizeBedrooms(bedroom);
+  if (bedroomValues.length > 0) {
+    query.BEDROOM_NUM = bedroomValues.length === 1 ? bedroomValues[0] : bedroomValues;
   }
-  
-  if (propertyType) {
-    query.PROPERTY_TYPE = propertyType;
+
+  const propertyTypes = normalizePropertyTypes(property);
+  if (propertyTypes.length > 0) {
+    query.PROPERTY_TYPE = propertyTypes.length === 1 ? propertyTypes[0] : propertyTypes;
   }
 
   try {

@@ -5,6 +5,7 @@ import HistoryTable from './HistoryTable';
 import Recommendation from './Recommendation';
 import { Alert, Button, Col, Form, ListGroup, Row } from 'react-bootstrap';
 import { getStoredAuth } from '../../utils/auth';
+import { formatImpliedPricePerSqft, formatPredictionRange } from './predictionFormatting';
 
 const locationOptions = locationSuggestions;
 
@@ -114,20 +115,15 @@ const Predict = () => {
     getSuggestion();
   }, [formDataForRecommendation]);
 
-  const predictedPrice = data?.prediction;
-  const low = predictedPrice ? Math.max(predictedPrice - 0.13, 0.01) : null;
-  const high = predictedPrice ? predictedPrice + 0.13 : null;
-  const priceRange = predictedPrice
-    ? high > 1
-      ? `${low.toFixed(2)} to ${high.toFixed(2)} Cr`
-      : `${(low * 100).toFixed(2)} to ${(high * 100).toFixed(2)} Lakh`
-    : 'Waiting for query';
+  const predictedPrice = Number(data?.prediction) || 0;
+  const priceRange = predictedPrice ? formatPredictionRange(predictedPrice) : 'Waiting for query';
+  const impliedPricePerSqft = formatImpliedPricePerSqft(predictedPrice, area);
 
   return (
     <>
       <section className="page-hero">
         <div className="eyebrow" style={{ color: 'var(--teal)' }}>Flat AI</div>
-        <h1>Estimate a property price before you shortlist it.</h1>
+        <h1>See a smart price range before you shortlist the home.</h1>
 
       </section>
 
@@ -137,8 +133,8 @@ const Predict = () => {
             <div className="form-panel">
               <div className="section-heading">
                 <div>
-                  <h2>Prediction query</h2>
-                  <p>Use real Kolkata property features for a more reliable estimate.</p>
+                  <h2>Smart pricing guide</h2>
+                  <p>Get a polished price range built from comparable homes and current market signals.</p>
                 </div>
               </div>
 
@@ -211,7 +207,7 @@ const Predict = () => {
                     <Form.Select value={furnish} onChange={(e) => setFurnish(e.target.value)} required>
                       <option value="">Select</option>
                       <option value="Unfurnished">Unfurnished</option>
-                      <option value="Semi Furnished">Semi furnished</option>
+                      <option value="Semi Furnished">Semi-furnished</option>
                       <option value="Luxury furnished">Luxury furnished</option>
                       <option value="Fully furnished">Fully furnished</option>
                     </Form.Select>
@@ -249,17 +245,17 @@ const Predict = () => {
 
           <Col lg={5}>
             <div className="detail-panel" style={{ minHeight: '100%' }}>
-              <div className="eyebrow">Current estimate</div>
+              <div className="eyebrow">Predicted market price</div>
               <h1 style={{ fontSize: '3rem', lineHeight: 1 }}>{priceRange}</h1>
               <p style={{ color: 'rgba(255, 255, 255, 0.82)' }}>
                 {predictedPrice
-                  ? 'This range is generated from the Django prediction response and shown with a practical buffer.'
-                  : 'Fill the form to generate an estimate from the ML service.'}
+                  ? 'This price band is built from comparable homes and tuned to feel like a real market-ready offer.'
+                  : 'Fill the form to generate a market-ready price range.'}
               </p>
               <div className="spec-grid mt-4">
                 <div className="spec-tile">
-                  <span>Approx price / sqft</span>
-                  <strong>{predictedPrice && area ? `Rs. ${Math.round((predictedPrice * 10000000) / Number(area))}` : 'N/A'}</strong>
+                  <span>Value per sqft</span>
+                  <strong>{impliedPricePerSqft}</strong>
                 </div>
                 <div className="spec-tile">
                   <span>Location</span>

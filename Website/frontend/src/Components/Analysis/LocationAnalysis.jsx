@@ -115,7 +115,7 @@ const LocationAnalysis = ({
           <Col md={3}>
             <div className="analytics-sidepanel">
               <h4>Show me by</h4>
-              <p className="analytics-muted">Filter the whole page by locality, then switch the map coloring to compare price, size, or density.</p>
+              <p className="analytics-muted">Filter the whole page by locality, then switch the map color-coding to compare price, size, or density.</p>
               <div className="analytics-toggle-group" role="tablist" aria-label="Map metric">
                 {categoryOptions.map((option) => (
                   <button

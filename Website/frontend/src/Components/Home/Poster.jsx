@@ -18,8 +18,8 @@ const Poster = () => {
             <span>listed flats</span>
           </div>
           <div className="hero-stat">
-            <strong>ML</strong>
-            <span>price insights</span>
+            <strong>Smart</strong>
+            <span>price ranges</span>
           </div>
           <div className="hero-stat">
             <strong>Live</strong>

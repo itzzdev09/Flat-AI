@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllData } from '../../RTK/Slices/allDataSlice';
 import { Button, Container } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { debounce } from 'lodash';
 import Loading from '../Sections/Loading';
 import { getStoredAuth } from '../../utils/auth';
 import { getPropertyImage } from '../../utils/propertyUtils';
@@ -94,28 +93,11 @@ const PropertyCard = ({ flat }) => {
 const AllFlats = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const { data, loading, error, hasMoreData } = useSelector((state) => state.allData);
+  const { data, loading, error, total, limit } = useSelector((state) => state.allData);
 
   useEffect(() => {
-    if (page > 1 && !loading && hasMoreData) {
-      dispatch(fetchAllData(page));
-    }
-  }, [page, dispatch, loading, hasMoreData]);
-
-  useEffect(() => {
-    const handleScroll = debounce(() => {
-      const windowHeight = window.innerHeight;
-      const fullHeight = document.documentElement.scrollHeight;
-      const currentScrollPosition = window.scrollY;
-
-      if (windowHeight + currentScrollPosition + 100 >= fullHeight && hasMoreData && !loading) {
-        setPage((prevPage) => prevPage + 1);
-      }
-    }, 300);
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [hasMoreData, loading]);
+    dispatch(fetchAllData(page));
+  }, [page, dispatch]);
 
   if (loading && page === 1) return <Loading />;
 
@@ -128,6 +110,28 @@ const AllFlats = () => {
     );
   }
 
+  const totalPages = Math.ceil(total / limit) || 1;
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const delta = 2;
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (
+        i === 1 ||
+        i === totalPages ||
+        (i >= page - delta && i <= page + delta)
+      ) {
+        pages.push(i);
+      } else if (pages[pages.length - 1] !== '...') {
+        pages.push('...');
+      }
+    }
+    return pages;
+  };
+
+  const pageNumbers = getPageNumbers();
+
   return (
     <section className="section-shell">
       {Array.isArray(data) && data.length > 0 ? (
@@ -138,12 +142,61 @@ const AllFlats = () => {
               <p>Browse verified local data with fast pagination and detail views.</p>
             </div>
           </div>
-          <div className="property-grid">
+          <div className={`property-grid ${loading ? 'opacity-50' : ''}`} style={{ transition: 'opacity 0.2s ease-in-out' }}>
             {data.map((flat) => <PropertyCard key={flat._id} flat={flat} />)}
           </div>
+
+          {totalPages > 1 && (
+            <div className="pagination-wrapper mt-5 d-flex justify-content-center align-items-center flex-wrap gap-2">
+              <Button
+                className="pagination-btn pagination-prev-next"
+                disabled={page === 1 || loading}
+                onClick={() => {
+                  setPage((p) => Math.max(p - 1, 1));
+                  window.scrollTo({ top: 400, behavior: 'smooth' });
+                }}
+              >
+                <i className="fa-solid fa-chevron-left"></i> Prev
+              </Button>
+
+              {pageNumbers.map((num, idx) => {
+                if (num === '...') {
+                  return (
+                    <span key={`dots-${idx}`} className="pagination-ellipsis px-2 text-muted">
+                      ...
+                    </span>
+                  );
+                }
+                return (
+                  <Button
+                    key={num}
+                    className={`pagination-btn pagination-num ${page === num ? 'active' : ''}`}
+                    disabled={loading}
+                    onClick={() => {
+                      setPage(num);
+                      window.scrollTo({ top: 400, behavior: 'smooth' });
+                    }}
+                  >
+                    {num}
+                  </Button>
+                );
+              })}
+
+              <Button
+                className="pagination-btn pagination-prev-next"
+                disabled={page === totalPages || loading}
+                onClick={() => {
+                  setPage((p) => Math.min(p + 1, totalPages));
+                  window.scrollTo({ top: 400, behavior: 'smooth' });
+                }}
+              >
+                Next <i className="fa-solid fa-chevron-right"></i>
+              </Button>
+            </div>
+          )}
         </>
       ) : null}
-      {loading && page > 1 ? <Loading /> : null}
+      {loading && page > 1 ? <div className="mt-3"><Loading /></div> : null}
     </section>
   );
 };

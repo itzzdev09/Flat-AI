@@ -12,6 +12,8 @@ const allDataSlice = createSlice({
   name: 'allData',
   initialState: {
     data: [],
+    total: 0,
+    limit: 12,
     loading: false,
     error: null,
     hasMoreData: true,
@@ -22,12 +24,16 @@ const allDataSlice = createSlice({
       .addCase(fetchAllData.fulfilled, (state, action) => {
         const fetchedData = action.payload
 
-        if (fetchedData.length !== 0) {
-          state.data.push(...fetchedData)
-          state.hasMoreData = true
+        if (fetchedData && typeof fetchedData === 'object' && !Array.isArray(fetchedData)) {
+          state.data = fetchedData.flats || []
+          state.total = fetchedData.total || 0
+          state.limit = fetchedData.limit || 12
         } else {
-          state.hasMoreData = false
+          state.data = fetchedData || []
+          state.total = fetchedData ? fetchedData.length : 0
+          state.limit = 12
         }
+        state.hasMoreData = state.data.length >= state.limit
         state.loading = false
         state.error = null
       })

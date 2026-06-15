@@ -10,9 +10,16 @@ export const searchFlatSlice = createAsyncThunk('search/flat', async (clientData
 const searchResult = createSlice({
   name:"searchResult",
   initialState:{
-    data: [],
+    data: { result: [] },
     loading: false,
     error: null,
+  },
+  reducers: {
+    resetSearchResults: (state) => {
+      state.data = { result: [] }
+      state.loading = false
+      state.error = null
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -33,4 +40,5 @@ const searchResult = createSlice({
 
 
 
+export const { resetSearchResults } = searchResult.actions
 export default searchResult.reducer
