@@ -116,6 +116,7 @@ const similarityScore = (source, target) => {
   return Math.min(score, 1)
 }
 
+// Score nearby flats, then blend their price-per-sqft into a market estimate.
 const estimatePrice = (data, properties) => {
   const source = normalizeQuery(data)
 
@@ -192,6 +193,7 @@ const hydrateRecommendation = (item, score) => ({
   Similarity: `${(score * 100).toFixed(2)}`,
 })
 
+// Reuse the same dataset to return ranked cards beside the prediction.
 const buildRecommendations = (query, properties, topN = 10) => {
   const source = {
     location: query.location,

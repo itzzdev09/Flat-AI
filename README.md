@@ -379,7 +379,8 @@ It is interesting because it uses two services:
 
 This is the ML prediction UI.
 
-It is the bridge between the user and the Django prediction service.
+It is the bridge between the user and the Node prediction route.
+The page now receives the prediction and recommendation cards from one backend call.
 
 #### `Components/Analysis/*`
 
@@ -402,6 +403,7 @@ It does several things:
 - installs middleware
 - mounts all routes
 - exposes `/api/allfilteredData`
+- exposes the working prediction route at `/api/prediction/submit`
 - starts the server
 - tries to connect to MongoDB
 - creates a bootstrap admin user if missing
@@ -514,11 +516,21 @@ Returns one property record by ID for the details page.
 
 Accepts a list of property IDs and returns the matching records.
 
-This is the second step in the recommendation flow after Django computes similarity.
+This is the second step in the recommendation flow when the UI already has ranked property IDs.
 
 #### `Website/Backend/Controllers/PredictionRecommendationController.js`
 
 Accepts predicted-property candidate data and returns property details from IDs and similarity scores.
+
+#### `Website/Backend/Controllers/PredictionController.js`
+
+This is the working prediction endpoint used by the website.
+
+It:
+
+- loads property data from the Node fallback layer
+- estimates the price band from the query
+- returns the recommendation cards in the same response
 
 #### `Website/Backend/Controllers/authController.js`
 
@@ -658,12 +670,11 @@ Then it returns the highest-ranked matches.
 ### Prediction Flow
 
 1. User fills the prediction form.
-2. React sends the query to Django `submit/`.
-3. Django estimates price from the dataset.
-4. Django returns a prediction and session ID.
-5. React fetches the stored prediction by session ID.
-6. React asks Django for prediction-based recommendations.
-7. The recommendation list is displayed below the form.
+2. React sends the query to `POST /api/prediction/submit`.
+3. Node estimates the price from the shared property dataset.
+4. Node builds the recommendation list from the same dataset.
+5. React displays the predicted band and recommendation cards below the form.
+6. Django can still run separately, but it is no longer required for this page.
 
 ### Auth Flow
 
@@ -700,9 +711,10 @@ Typical variables used by `Website/Backend/server.js` and the DB layer:
 The React app expects:
 
 - `REACT_APP_NODE_API_URL`
-- `REACT_APP_DJANGO_API_URL`
 
 These should include the trailing `/api/` path if you want the existing code to work as-is.
+
+`REACT_APP_DJANGO_API_URL` is still useful if you want to run the Django service manually, but the current prediction page does not rely on it.
 
 ### Django
 
@@ -726,7 +738,8 @@ That script starts:
 - the React frontend
 - the Django ML service
 
-It also passes backend Mongo env values into the Django process when needed.
+It prefers the repo virtualenv for Django, passes backend Mongo env values into the Django process, and starts the ML server on `0.0.0.0:8000`.
+The prediction page itself uses the Node prediction route, so the website still works even if Django is unavailable.
 
 If you prefer to start them separately:
 
@@ -1008,7 +1021,7 @@ This documentation file explains the system architecture, concepts, request flow
 
 This PowerShell script starts the backend, frontend, and Django service together on Windows.
 
-It also passes relevant Mongo env values into the Django process so the services can share the same configuration when needed.
+It prefers the repo `.venv` Python, passes relevant Mongo env values into the Django process, and starts Django on `0.0.0.0:8000`.
 
 #### `.gitignore`
 
@@ -1115,9 +1128,9 @@ The main ML prediction form.
 It:
 
 - collects property features
-- sends them to Django
+- sends them to the Node prediction route
 - shows the predicted price
-- fetches prediction-based recommendations
+- renders the recommendation cards returned in the same response
 - stores per-user history in localStorage
 
 #### `Website/frontend/src/Components/Prediction/HistoryTable.jsx`
@@ -1128,6 +1141,9 @@ Shows previous prediction queries for the current user.
 
 Shows recommendation results after prediction.
 
+This component now only renders the recommendation array it receives from the prediction page.
+It no longer dispatches a second request on its own.
+
 #### `Website/frontend/src/Components/PropertyDetailsPage/Details.jsx`
 
 Shows the main body of the property details page.
@@ -1137,6 +1153,8 @@ Shows the main body of the property details page.
 Shows similar properties.
 
 It combines Django similarity ranking with Node data hydration.
+
+For the prediction page, the working flow now stays inside Node so the browser does not need to reach Django directly.
 
 #### `Website/frontend/src/Components/Analysis/*`
 
@@ -1172,7 +1190,8 @@ Manages one-property detail fetches.
 
 #### `Website/frontend/src/RTK/Slices/PredictionRecommendationSlice.js`
 
-Manages recommendation fetches for predicted properties.
+Legacy recommendation hydrator kept for the older two-step flow.
+The current prediction page gets its recommendations from the Node prediction endpoint directly.
 
 #### `Website/frontend/src/utils/auth.js`
 
@@ -1217,6 +1236,10 @@ Fetches one property by ID.
 #### `Website/Backend/Routes/SinglePropertyRecommendationRoute.js`
 
 Hydrates a list of property IDs into full property documents.
+
+#### `Website/Backend/Routes/PredictionRoute.js`
+
+Receives the prediction form submission from the React app and returns the price estimate plus recommendation cards.
 
 #### `Website/Backend/Routes/PredictionRecommendationRouter.js`
 
@@ -1374,11 +1397,11 @@ Django's local SQLite database used for the Python side of the project.
 ### Example: Predict a price
 
 1. User enters property features on the prediction page.
-2. React sends the feature payload to Django.
-3. Django normalizes the values.
-4. Django finds comparable properties in the dataset.
-5. Django calculates a weighted predicted price.
-6. React displays the value and fetches similar recommendations.
+2. React sends the feature payload to `POST /api/prediction/submit`.
+3. Node normalizes the values and scores comparable properties.
+4. Node calculates a weighted predicted price.
+5. Node returns the price band and recommendation cards together.
+6. React displays the value and the recommendations under the form.
 
 ### Example: Admin changes a user role
 
