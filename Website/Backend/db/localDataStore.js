@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import path from 'path';
 import { execFile } from 'child_process';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 import FlatData from './FlatModel.js';
 import { matchesLocationQuery } from '../utils/location.js';
 
@@ -33,6 +34,17 @@ const loadFallbackFlatData = async () => {
     return fallbackFlatCache;
   }
 
+  const jsonPath = path.resolve(__dirname, '../../ml/pkl/prediction_df.json');
+  if (fs.existsSync(jsonPath)) {
+    try {
+      const raw = await fs.promises.readFile(jsonPath, 'utf8');
+      fallbackFlatCache = JSON.parse(raw).map((item, index) => finalizeFlat(normalizeFlat(item, index)));
+      return fallbackFlatCache;
+    } catch (e) {
+      console.error('Error reading fallback JSON cache, generating from pickle...', e);
+    }
+  }
+
   const python = process.env.PYTHON || 'python';
   const script = [
     'import math',
@@ -61,6 +73,11 @@ const loadFallbackFlatData = async () => {
   });
 
   const parsed = JSON.parse(raw);
+
+  fs.promises.writeFile(jsonPath, raw, 'utf8').catch((err) => {
+    console.error('Failed to write fallback JSON cache:', err);
+  });
+
   fallbackFlatCache = parsed.map((item, index) => finalizeFlat(normalizeFlat(item, index)));
   return fallbackFlatCache;
 };
@@ -90,7 +107,7 @@ const normalizeFlat = (item, index = 0) => ({
   ...item,
   _id: item._id || item.PROP_ID || String(index + 1),
   SOCIETY_NAME: toTitleCase(item.SOCIETY_NAME),
-  PROPERTY_TYPE: 'Local Flat',
+  PROPERTY_TYPE: toTitleCase(item.PROPERTY_TYPE),
   CITY: toTitleCase(item.CITY),
   location: toTitleCase(item.location),
   PROJECT_LABEL: toProjectLabel(item.SOCIETY_NAME),

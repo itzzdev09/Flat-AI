@@ -29,12 +29,6 @@ const Predict = () => {
   const { token, user } = getStoredAuth();
   const historyKey = user ? `searchHistory:${user._id}` : 'searchHistory';
 
-  const fetchData = async (sessionId) => {
-    if (!sessionId) return;
-    const response = await axios.get(`${process.env.REACT_APP_DJANGO_API_URL}fetchdata/?session_id=${sessionId}`);
-    setData(response.data);
-  };
-
   useEffect(() => {
     if (!token) {
       setHistory([]);
@@ -76,10 +70,12 @@ const Predict = () => {
     try {
       const response = await axios.post(`${process.env.REACT_APP_DJANGO_API_URL}submit/`, query);
       const result = response.data;
+      const predictionPayload = { prediction: result.prediction };
       const recommendationQuery = { ...query, PRICE: result.prediction };
 
+      setData(predictionPayload);
+      setPredictedData(null);
       setFormDataForRecommendation(recommendationQuery);
-      await fetchData(result.session_id);
 
       if (token) {
         const updatedHistory = [{ query, prediction: result.prediction }, ...history];
