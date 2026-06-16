@@ -5,6 +5,7 @@ import {
   createProperty,
   deleteProperty,
   getAdminSummary,
+  getAdminDashboard,
   getProperties,
   getUsers,
   updateProperty,
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.use(protect, requireAdmin);
 
+router.get('/dashboard', getAdminDashboard);
 router.get('/summary', getAdminSummary);
 router.get('/users', getUsers);
 router.patch('/users/:id/role', updateUserRole);

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Alert, Button, Col, Form, Row, Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { getAuthHeaders, getStoredAuth } from '../utils/auth';
+import { clearStoredAuth, getAuthHeaders, getStoredAuth } from '../utils/auth';
 
 const emptyProperty = {
   PROP_ID: '',
@@ -30,50 +30,64 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!token) {
-      navigate('/login', { replace: true });
-      return;
-    }
-
-    if ((user?.role || 'user') !== 'admin') {
-      navigate('/profile', { replace: true });
-      return;
-    }
+    let isActive = true;
 
     const load = async () => {
-      try {
-        const [summaryResponse, usersResponse, propertyResponse] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_NODE_API_URL}admin/summary`, { headers: getAuthHeaders() }),
-          axios.get(`${process.env.REACT_APP_NODE_API_URL}admin/users`, { headers: getAuthHeaders() }),
-          axios.get(`${process.env.REACT_APP_NODE_API_URL}admin/properties`, { headers: getAuthHeaders() }),
-        ]);
+      if (!token) {
+        navigate('/login', { replace: true });
+        return;
+      }
 
-        setSummary(summaryResponse.data);
-        setUsers(usersResponse.data);
-        setProperties(propertyResponse.data);
+      try {
+        const currentUser = user || getStoredAuth().user;
+
+        if ((currentUser?.role || 'user') !== 'admin') {
+          navigate('/profile', { replace: true });
+          return;
+        }
+
+        const response = await axios.get(`${process.env.REACT_APP_NODE_API_URL}admin/dashboard`, {
+          headers: getAuthHeaders(),
+        });
+
+        if (!isActive) return;
+        setSummary(response.data.summary);
+        setUsers(response.data.users);
+        setProperties(response.data.properties);
       } catch (err) {
+        if (!isActive) return;
+
+        if (err.response?.status === 401) {
+          clearStoredAuth();
+          navigate('/login', { replace: true });
+          return;
+        }
+
         setError(err.response?.data?.message || 'Failed to load admin data.');
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     };
 
     load();
-  }, [navigate, token, user?.role]);
+    return () => {
+      isActive = false;
+    };
+  }, [navigate, token, user]);
 
   const updateField = (event) => {
     setPropertyForm((current) => ({ ...current, [event.target.name]: event.target.value }));
   };
 
   const refreshData = async () => {
-    const [summaryResponse, usersResponse, propertyResponse] = await Promise.all([
-      axios.get(`${process.env.REACT_APP_NODE_API_URL}admin/summary`, { headers: getAuthHeaders() }),
-      axios.get(`${process.env.REACT_APP_NODE_API_URL}admin/users`, { headers: getAuthHeaders() }),
-      axios.get(`${process.env.REACT_APP_NODE_API_URL}admin/properties`, { headers: getAuthHeaders() }),
-    ]);
-    setSummary(summaryResponse.data);
-    setUsers(usersResponse.data);
-    setProperties(propertyResponse.data);
+    const response = await axios.get(`${process.env.REACT_APP_NODE_API_URL}admin/dashboard`, {
+      headers: getAuthHeaders(),
+    });
+    setSummary(response.data.summary);
+    setUsers(response.data.users);
+    setProperties(response.data.properties);
   };
 
   const submitProperty = async (event) => {

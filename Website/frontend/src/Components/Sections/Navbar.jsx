@@ -2,20 +2,40 @@ import React, { useEffect, useState } from 'react';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import logo from './building.png';
-import { AUTH_CHANGE_EVENT, clearStoredAuth, getStoredAuth } from '../../utils/auth';
+import { AUTH_CHANGE_EVENT, clearStoredAuth, getStoredAuth, refreshStoredAuth } from '../../utils/auth';
 
 function NavBar() {
   const [user, setUser] = useState(() => getStoredAuth().user);
 
   useEffect(() => {
-    const syncUser = () => {
-      setUser(getStoredAuth().user);
+    let isActive = true;
+
+    const syncUser = async () => {
+      const { token, user: storedUser } = getStoredAuth();
+
+      if (!token) {
+        if (isActive) setUser(null);
+        return;
+      }
+
+      try {
+        const refreshed = await refreshStoredAuth();
+        if (isActive) {
+          setUser(refreshed?.user || storedUser);
+        }
+      } catch {
+        if (isActive) {
+          setUser(storedUser);
+        }
+      }
     };
 
     window.addEventListener(AUTH_CHANGE_EVENT, syncUser);
     window.addEventListener('storage', syncUser);
+    syncUser();
 
     return () => {
+      isActive = false;
       window.removeEventListener(AUTH_CHANGE_EVENT, syncUser);
       window.removeEventListener('storage', syncUser);
     };

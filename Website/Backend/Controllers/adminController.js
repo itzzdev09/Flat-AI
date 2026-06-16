@@ -76,6 +76,33 @@ export const getAdminSummary = async (req, res) => {
   }
 };
 
+export const getAdminDashboard = async (_req, res) => {
+  try {
+    const fallbackFlats = FlatData.db.readyState === 1 ? null : await getFilteredFlats();
+    const [users, propertyCount, properties] = await Promise.all([
+      listUsers(),
+      FlatData.db.readyState === 1
+        ? FlatData.countDocuments()
+        : fallbackFlats.length,
+      FlatData.db.readyState === 1
+        ? FlatData.find().sort({ createdAt: -1 }).limit(25).lean()
+        : fallbackFlats.slice(0, 25),
+    ]);
+
+    return res.status(200).json({
+      summary: {
+        users: users.length,
+        properties: propertyCount,
+        admins: users.filter((user) => (user.role || 'user') === 'admin').length,
+      },
+      users,
+      properties,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to load admin dashboard', error: error.message });
+  }
+};
+
 export const getUsers = async (_req, res) => {
   try {
     const users = await listUsers();

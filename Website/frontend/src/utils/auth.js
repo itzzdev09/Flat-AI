@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 const AUTH_TOKEN_KEY = 'authToken';
 const AUTH_USER_KEY = 'authUser';
 const AUTH_SESSION_KEY = 'authSession';
@@ -122,6 +124,39 @@ export const storeAuthSession = ({ token, user, session }) => {
 export const getAuthHeaders = () => {
   const { token } = getStoredAuth();
   return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+export const refreshStoredAuth = async () => {
+  const { token } = getStoredAuth();
+  if (!token) {
+    return null;
+  }
+
+  const response = await axios.get(`${process.env.REACT_APP_NODE_API_URL}auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (typeof window !== 'undefined') {
+    const { user, session } = response.data || {};
+
+    if (user) {
+      window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+    }
+
+    if (session?.expiresAt) {
+      window.localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
+    } else {
+      window.localStorage.removeItem(AUTH_SESSION_KEY);
+    }
+
+    dispatchAuthChange();
+  }
+
+  return {
+    token,
+    user: response.data?.user || null,
+    session: response.data?.session || null,
+  };
 };
 
 export const formatSessionDuration = (expiresInSeconds) => {
