@@ -17,17 +17,13 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() == 'true'
 
 
 # ALLOWED_HOSTS defaults to an empty list here.
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'abharole.in']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver', 'abharole.in']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
     'django.contrib.staticfiles',
     'prediction',
     'Recommendation',
@@ -37,11 +33,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -60,8 +53,6 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -71,7 +62,7 @@ WSGI_APPLICATION = 'ml.wsgi.application'
 
 
 # Database
-# Django stores its local ML/auth data in a SQLite file beside this settings module.
+# Django stores its local ML data in a SQLite file beside this settings module.
 # The file is created automatically on first migrate/run if it does not already exist.
 DJANGO_SQLITE_PATH = Path(os.environ.get('DJANGO_SQLITE_PATH', BASE_DIR / 'db.sqlite3'))
 
@@ -81,25 +72,6 @@ DATABASES = {
         'NAME': DJANGO_SQLITE_PATH,
     }
 }
-
-
-# Password validation
-# The validator reference is documented at https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
 
 
 # Internationalization

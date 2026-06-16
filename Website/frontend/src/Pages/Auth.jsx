@@ -84,7 +84,7 @@ const Auth = ({ mode }) => {
           <div className="metric-strip">
             <div className="metric-tile"><strong>{sessionLabel}</strong><span>default sign-in length</span></div>
             <div className="metric-tile"><strong>Smart</strong><span>price ranges</span></div>
-            <div className="metric-tile"><strong>Mongo</strong><span>profile-ready API</span></div>
+            <div className="metric-tile"><strong>Serving</strong><span>Best Properties</span></div>
           </div>
         </Col>
 

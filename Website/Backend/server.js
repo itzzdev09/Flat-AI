@@ -72,7 +72,7 @@ app.get('/api/allfilteredData', async (req, res) => {
 
 
 // Server bootstrap
-const PORT = process.env.PORT || 4000
+const PORT = process.env.PORT || 4002
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'admin@flat.ai').toLowerCase().trim()
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'secret12'
 
