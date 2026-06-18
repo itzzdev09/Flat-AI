@@ -1,7 +1,6 @@
 import React from 'react';
 import image1 from '../../Images/image1.jpeg';
 import { motion, useReducedMotion } from 'framer-motion';
-import ThreeBackdrop from '../Sections/ThreeBackdrop';
 
 const Poster = () => {
   const reduceMotion = useReducedMotion();
@@ -9,7 +8,6 @@ const Poster = () => {
   return (
     <section className="hero-shell">
       <img className="hero-media" src={image1} alt="Kolkata residential skyline" />
-      <ThreeBackdrop />
       <motion.div
         className="hero-content"
         initial={reduceMotion ? false : { opacity: 0, y: 20 }}

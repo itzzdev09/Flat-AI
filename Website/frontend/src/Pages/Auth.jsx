@@ -71,29 +71,41 @@ const Auth = ({ mode }) => {
 
   return (
     <section className="section-shell" style={{ minHeight: '74vh', display: 'grid', alignItems: 'center' }}>
-      <Row className="g-4 align-items-center">
+      <Row className="g-4 align-items-stretch">
         <Col lg={6}>
-          <div className="page-hero" style={{ width: 'auto', padding: 0 }}>
+          <div className="auth-sidecard">
             <div className="eyebrow">Private workspace</div>
-            <h1>{isSignup ? 'Create your search account.' : 'Welcome back to your property desk.'}</h1>
+            <h3>{isSignup ? 'Create a clean property account' : 'Welcome back to your property desk'}</h3>
             <p>
               Save homes, keep prediction history, and move between search and recommendations
-              with a timed JWT-secured account handled by the Node API.
+              with a secure session handled by the Node API.
             </p>
-          </div>
-          <div className="metric-strip">
-            <div className="metric-tile"><strong>{sessionLabel}</strong><span>default sign-in length</span></div>
-            <div className="metric-tile"><strong>Smart</strong><span>price ranges</span></div>
-            <div className="metric-tile"><strong>Serving</strong><span>Best Properties</span></div>
+            <div className="auth-points">
+              <div className="auth-point">
+                <strong>{sessionLabel}</strong>
+                <span>Default sign-in length, adjustable through your session token.</span>
+              </div>
+              <div className="auth-point">
+                <strong>Saved locally to your account</strong>
+                <span>Wishlists and history stay tied to the profile you are using.</span>
+              </div>
+              <div className="auth-point">
+                <strong>Focused workflow</strong>
+                <span>Search, compare, and shortlist without visual clutter.</span>
+              </div>
+            </div>
           </div>
         </Col>
 
         <Col lg={6}>
-          <div className="form-panel">
-            <h2 className="mb-1">{isSignup ? 'Sign up' : 'Login'}</h2>
-            <p className="property-meta mb-4">
-              {isSignup ? 'Start a new Flat AI account.' : 'Use your existing Flat AI account.'} Sessions expire automatically after {sessionLabel}.
-            </p>
+          <div className="form-panel auth-panel">
+            <div className="position-relative">
+              <div className="eyebrow">Secure access</div>
+              <h2 className="mb-1">{isSignup ? 'Sign up' : 'Login'}</h2>
+              <p className="property-meta mb-4">
+                {isSignup ? 'Start a new Flat AI account.' : 'Use your existing Flat AI account.'} Sessions expire automatically after {sessionLabel}.
+              </p>
+            </div>
 
             {error ? <Alert variant="danger">{error}</Alert> : null}
 
