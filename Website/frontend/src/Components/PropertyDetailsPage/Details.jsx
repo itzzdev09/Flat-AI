@@ -8,6 +8,7 @@ import Loading from '../Sections/Loading';
 import { normalizeCoordinates } from '../Analysis/analysisHelpers';
 import { getPropertyImage } from '../../utils/propertyUtils';
 import { getStoredAuth } from '../../utils/auth';
+import { MotionSection } from '../Sections/Motion';
 
 const formatPrice = (price) => (
   price > 1 ? `Rs. ${price.toFixed(2)} Cr` : `Rs. ${(price * 100).toFixed(2)} Lakh`
@@ -78,7 +79,7 @@ const Details = () => {
 
   return (
     <>
-      <section className="section-shell">
+      <MotionSection className="section-shell">
         <div className="detail-hero">
           <img className="detail-image" src={getPropertyImage(item)} alt={`${item.LISTING_TITLE || item.SOCIETY_NAME}, ${item.CITY}`} />
           <aside className="detail-panel">
@@ -110,9 +111,9 @@ const Details = () => {
             </div>
           </aside>
         </div>
-      </section>
+      </MotionSection>
 
-      <section className="section-shell content-grid">
+      <MotionSection className="section-shell content-grid">
         <div className="feature-band">
           <div className="section-heading">
             <div>
@@ -145,9 +146,9 @@ const Details = () => {
             Open in maps <i className="fa-solid fa-arrow-up-right-from-square"></i>
           </a>
         </aside>
-      </section>
+      </MotionSection>
 
-      <section className="section-shell">
+      <MotionSection className="section-shell">
         <div className="section-heading">
           <div>
             <h2>Neighborhood access</h2>
@@ -162,11 +163,11 @@ const Details = () => {
           {renderNearbyPlaces(item.Nearest_Public_Transport, 'Transit', <i className="fa-solid fa-bus"></i>)}
           {renderNearbyPlaces(item.Nearest_Restaurants, 'Restaurants', <i className="fa-solid fa-utensils"></i>)}
         </div>
-      </section>
+      </MotionSection>
 
-      <section className="section-shell">
+      <MotionSection className="section-shell">
         <SuggestedProperty id={id} />
-      </section>
+      </MotionSection>
     </>
   );
 };

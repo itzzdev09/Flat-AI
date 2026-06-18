@@ -3,9 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllData } from '../../RTK/Slices/allDataSlice';
 import { Button, Container } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Loading from '../Sections/Loading';
 import { getStoredAuth } from '../../utils/auth';
 import { getPropertyImage } from '../../utils/propertyUtils';
+import { cardMotion } from '../Sections/Motion';
 
 const formatPrice = (price) => (
   price > 1 ? `Rs. ${price.toFixed(2)} Cr` : `Rs. ${(price * 100).toFixed(2)} Lakh`
@@ -34,7 +36,7 @@ const PropertyCard = ({ flat }) => {
   };
 
   return (
-    <article className="property-card">
+    <motion.article className="property-card" {...cardMotion}>
       <div className="property-card-row">
         <img
           className="property-image"
@@ -93,7 +95,7 @@ const PropertyCard = ({ flat }) => {
           </div>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 };
 
@@ -150,7 +152,7 @@ const AllFlats = () => {
               <p>Browse verified local data with fast pagination and detail views.</p>
             </div>
           </div>
-          <div className={`property-grid ${loading ? 'opacity-50' : ''}`} style={{ transition: 'opacity 0.2s ease-in-out' }}>
+          <div className={`property-grid motion-stagger ${loading ? 'opacity-50' : ''}`} style={{ transition: 'opacity 0.2s ease-in-out' }}>
             {data.map((flat) => <PropertyCard key={flat._id} flat={flat} />)}
           </div>
 

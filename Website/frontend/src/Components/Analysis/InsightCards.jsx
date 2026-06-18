@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { countByField, formatCrore, toNumber } from './analysisHelpers';
+import { cardMotion } from '../Sections/Motion';
 
 const getGroupedMetric = (data, metric) => {
   const grouped = {};
@@ -68,11 +70,11 @@ const InsightCards = ({ data = [] }) => {
       </div>
       <div className="insight-grid">
         {insights.map((item) => (
-          <article key={item.title} className="insight-card">
+          <motion.article key={item.title} className="insight-card" {...cardMotion}>
             <span>{item.title}</span>
             <strong>{item.value}</strong>
             <p>{item.note}</p>
-          </article>
+          </motion.article>
         ))}
       </div>
     </section>

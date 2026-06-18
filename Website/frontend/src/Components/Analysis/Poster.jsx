@@ -19,7 +19,7 @@ const Poster = ({ data = [] }) => {
 
   return (
     <section className="page-hero">
-      <div className="eyebrow" style={{ color: 'var(--teal)' }}>Market snapshot</div>
+      <div className="eyebrow">Market snapshot</div>
       <h1>See how homes are priced across the city.</h1>
       <p>
         Explore pricing clusters, neighborhood pressure, and inventory mix from the same live

@@ -28,7 +28,7 @@ const WishList = () => {
     return (
       <>
         <section className="page-hero">
-          <div className="eyebrow" style={{ color: 'var(--teal)' }}>Saved homes</div>
+          <div className="eyebrow">Saved homes</div>
           <h1>Log in to use the wishlist.</h1>
           <p>Wishlist items are tied to your account now, so saved homes stay with you instead of living in a shared browser cache.</p>
         </section>
@@ -53,7 +53,7 @@ const WishList = () => {
   return (
     <>
       <section className="page-hero">
-        <div className="eyebrow" style={{ color: 'var(--teal)' }}>Saved homes</div>
+        <div className="eyebrow">Saved homes</div>
         <h1>Your shortlist, ready for a second look.</h1>
         <p>
           Compare saved homes without losing your place in the search flow.

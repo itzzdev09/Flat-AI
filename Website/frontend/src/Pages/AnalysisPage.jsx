@@ -8,6 +8,7 @@ import Loading from '../Components/Sections/Loading'
 import HistogramPlot from '../Components/Analysis/HistogramPlot'
 import InsightCards from '../Components/Analysis/InsightCards'
 import { filterByLocation } from '../Components/Analysis/analysisHelpers'
+import { MotionSection } from '../Components/Sections/Motion'
 
 const AnalysisPage = () => {
   const [data, setData] = useState([])
@@ -54,18 +55,20 @@ const AnalysisPage = () => {
 
   return (
     <>
-      <Poster data={filteredData} />
-      <InsightCards data={filteredData} />
-      <LocationAnalysis
-        data={filteredData}
-        locationInput={locationInput}
-        setLocationInput={setLocationInput}
-        suggestions={locationSuggestions}
-        totalListings={data.length}
-      />
-      <BarPlot data={filteredData} />
-      <HistogramPlot data={filteredData} />
-      <BoxPlot data={filteredData} />
+      <MotionSection><Poster data={filteredData} /></MotionSection>
+      <MotionSection><InsightCards data={filteredData} /></MotionSection>
+      <MotionSection>
+        <LocationAnalysis
+          data={filteredData}
+          locationInput={locationInput}
+          setLocationInput={setLocationInput}
+          suggestions={locationSuggestions}
+          totalListings={data.length}
+        />
+      </MotionSection>
+      <MotionSection><BarPlot data={filteredData} /></MotionSection>
+      <MotionSection><HistogramPlot data={filteredData} /></MotionSection>
+      <MotionSection><BoxPlot data={filteredData} /></MotionSection>
     </>
   )
 }

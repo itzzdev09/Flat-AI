@@ -10,7 +10,7 @@ const Footer = () => {
       <Container>
         <Row className="align-items-center">
           <Col md={6}>
-            <strong style={{ color: 'var(--forest)' }}>Flat AI</strong>
+            <strong style={{ color: 'var(--primary)' }}>Flat AI</strong>
             <p className="mb-0">Kolkata real estate search, prediction, and recommendations.</p>
           </Col>
           <Col md={6} className="text-md-end mt-3 mt-md-0">

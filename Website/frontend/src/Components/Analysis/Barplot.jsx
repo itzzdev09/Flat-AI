@@ -10,6 +10,7 @@ const BarPlot = ({ data = [] }) => {
   );
   const priciest = averagedData[0];
   const valuePocket = [...averagedData].sort((a, b) => a.value - b.value)[0];
+  const barColors = averagedData.map((_, index) => (index === 0 ? chartPalette[5] : chartPalette[0])).reverse();
 
   return (
     <Container className="section-shell">
@@ -28,7 +29,7 @@ const BarPlot = ({ data = [] }) => {
                 y: averagedData.map((item) => item.label).reverse(),
                 type: 'bar',
                 orientation: 'h',
-                marker: { color: chartPalette.slice(0, averagedData.length).reverse() },
+                marker: { color: barColors },
                 hovertemplate: '%{y}: Rs. %{x:.0f} / sqft<extra></extra>',
               }]}
               layout={chartLayout({

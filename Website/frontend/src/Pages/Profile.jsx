@@ -154,7 +154,7 @@ const Profile = () => {
   return (
     <>
       <section className="page-hero">
-        <div className="eyebrow" style={{ color: 'var(--teal)' }}>Account</div>
+        <div className="eyebrow">Account</div>
         <h1>Your profile and security settings.</h1>
         <p>
           Update your name, email, and password without leaving the workspace.

@@ -11,6 +11,7 @@ import { locationSuggestions } from '../../others/Keywords';
 import { useDispatch } from 'react-redux';
 import { resetSearchResults, searchFlatSlice } from '../../RTK/Slices/SearchSlice';
 import { getLocationSuggestions } from '../../utils/propertyUtils';
+import { motion } from 'framer-motion';
 
 const FindFlat = () => {
   const locationOptions = locationSuggestions;
@@ -60,7 +61,13 @@ const FindFlat = () => {
 
   return (
     <Container>
-      <div className="search-console">
+      <motion.div
+        className="search-console"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      >
         <div className="section-heading">
           <div>
             <h2>Search Kolkata flats</h2>
@@ -163,7 +170,7 @@ const FindFlat = () => {
             </Col>
           </Row>
         </Form>
-      </div>
+      </motion.div>
     </Container>
   );
 };

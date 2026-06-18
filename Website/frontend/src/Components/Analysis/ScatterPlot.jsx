@@ -41,8 +41,8 @@ const ScatterPlot = ({ data = [] }) => {
     marker: {
       size: groupedData[group].size,
       opacity: 0.75,
-      color: chartPalette[index % chartPalette.length],
-      line: { width: 1, color: 'rgba(255,255,255,0.5)' },
+      color: chartPalette[index % 5],
+      line: { width: 1, color: '#ffffff' },
     },
     text: groupedData[group].text,
     hovertemplate: '%{text}<extra></extra>',

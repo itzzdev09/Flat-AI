@@ -31,23 +31,23 @@ const getMetricValue = (item, selectedCategory) => {
 
 const getMarkerColor = (value, selectedCategory) => {
   if (selectedCategory === 'BHK') {
-    if (value >= 4) return '#f97316';
-    if (value >= 3) return '#0d9488';
-    return '#3b82f6';
+    if (value >= 4) return '#D4AF37';
+    if (value >= 3) return '#1E40AF';
+    return '#60A5FA';
   }
   if (selectedCategory === 'Price (Crores)') {
-    if (value >= 1.25) return '#f97316';
-    if (value >= 0.75) return '#14b8a6';
-    return '#3b82f6';
+    if (value >= 1.25) return '#D4AF37';
+    if (value >= 0.75) return '#1E40AF';
+    return '#60A5FA';
   }
   if (selectedCategory === 'Price/Sqft') {
-    if (value >= 8000) return '#f97316';
-    if (value >= 6000) return '#14b8a6';
-    return '#3b82f6';
+    if (value >= 8000) return '#D4AF37';
+    if (value >= 6000) return '#1E40AF';
+    return '#60A5FA';
   }
-  if (value >= 1600) return '#f97316';
-  if (value >= 1100) return '#14b8a6';
-  return '#3b82f6';
+  if (value >= 1600) return '#D4AF37';
+  if (value >= 1100) return '#1E40AF';
+  return '#60A5FA';
 };
 
 const MapViewportController = ({ mapRef, points }) => {
@@ -97,6 +97,11 @@ const LocationAnalysis = ({
     })
     .filter(Boolean);
   const mapPoints = mapData.map((item) => [item.coordinates.lat, item.coordinates.lng]);
+  const legendItems = [
+    { label: 'Lower range', color: '#60A5FA' },
+    { label: 'Mid range', color: '#1E40AF' },
+    { label: 'Premium', color: '#D4AF37' },
+  ];
 
   return (
     <section className="section-shell">
@@ -146,6 +151,38 @@ const LocationAnalysis = ({
 
           <Col md={9}>
             <div className="analytics-plot-shell analytics-map-shell">
+              <div className="map-overlay map-overlay-panel">
+                <h3>Neighborhood map</h3>
+                <p>
+                  Marker colors switch with the selected metric so you can read the market at a glance.
+                </p>
+                <div className="map-overlay-chip">
+                  <i className="fa-solid fa-location-crosshairs"></i>
+                  Live listings and nearby context
+                </div>
+              </div>
+              <div className="map-overlay map-north">
+                <div className="map-north-arrow" />
+                <strong>N</strong>
+                <span>North</span>
+              </div>
+              <div className="map-overlay map-legend">
+                <div className="map-legend-title">Legend</div>
+                {legendItems.map((item) => (
+                  <div key={item.label} className="map-legend-row">
+                    <span className="legend-swatch" style={{ background: item.color }} />
+                    <span>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="map-overlay map-scale">
+                <div className="map-scale-bar" />
+                <div className="map-scale-labels">
+                  <span>0 km</span>
+                  <span>Approx. scale</span>
+                  <span>2 km</span>
+                </div>
+              </div>
               <MapContainer center={[22.5726, 88.3639]} zoom={11} scrollWheelZoom className="leaflet-map">
                 <MapViewportController mapRef={mapRef} points={mapPoints} />
                 <TileLayer

@@ -74,7 +74,7 @@ const Auth = ({ mode }) => {
       <Row className="g-4 align-items-center">
         <Col lg={6}>
           <div className="page-hero" style={{ width: 'auto', padding: 0 }}>
-            <div className="eyebrow" style={{ color: 'var(--teal)' }}>Private workspace</div>
+            <div className="eyebrow">Private workspace</div>
             <h1>{isSignup ? 'Create your search account.' : 'Welcome back to your property desk.'}</h1>
             <p>
               Save homes, keep prediction history, and move between search and recommendations

@@ -101,7 +101,7 @@ const Predict = () => {
   return (
     <>
       <section className="page-hero">
-        <div className="eyebrow" style={{ color: 'var(--teal)' }}>Flat AI</div>
+        <div className="eyebrow">Flat AI</div>
         <h1>See a smart price range before you shortlist the home.</h1>
 
       </section>

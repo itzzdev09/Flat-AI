@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { getStoredAuth } from '../../utils/auth';
 import { getPropertyImage } from '../../utils/propertyUtils';
+import { cardMotion } from '../Sections/Motion';
 
 const formatPrice = (price) => (
   price > 1 ? `Rs. ${price.toFixed(2)} Cr` : `Rs. ${(price * 100).toFixed(2)} Lakh`
@@ -46,7 +48,7 @@ const SearchResult = () => {
 
       <div className="property-grid">
         {data.result.map((flat) => (
-          <article className="property-card" key={flat._id}>
+          <motion.article className="property-card" key={flat._id} {...cardMotion}>
             <div className="property-card-row">
               <img
                 className="property-image"
@@ -93,7 +95,7 @@ const SearchResult = () => {
                 </div>
               </div>
             </div>
-          </article>
+          </motion.article>
         ))}
       </div>
     </section>

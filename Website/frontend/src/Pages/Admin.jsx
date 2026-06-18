@@ -145,7 +145,7 @@ const Admin = () => {
   return (
     <>
       <section className="page-hero">
-        <div className="eyebrow" style={{ color: 'var(--teal)' }}>Admin portal</div>
+        <div className="eyebrow">Admin portal</div>
         <h1>Manage users and listings.</h1>
         <p>Switch roles, review the catalog, and add or remove properties from the admin dashboard.</p>
       </section>

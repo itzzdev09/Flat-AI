@@ -4,10 +4,12 @@ import axios from 'axios';
 import { Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
+import { motion } from 'framer-motion';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Loading from '../Sections/Loading';
 import { getPropertyImage } from '../../utils/propertyUtils';
+import { cardMotion } from '../Sections/Motion';
 
 const SuggestedProperty = ({ id }) => {
   const [result, setResult] = useState([]);
@@ -88,7 +90,7 @@ const SuggestedProperty = ({ id }) => {
 
       <Slider {...sliderSettings}>
         {result.map((item) => (
-          <div key={item._id}>
+          <motion.div key={item._id} {...cardMotion}>
             <Card className="property-card" style={{ margin: '10px' }}>
                 <Card.Img
                 variant="top"
@@ -112,7 +114,7 @@ const SuggestedProperty = ({ id }) => {
                 </div>
               </Card.Body>
             </Card>
-          </div>
+          </motion.div>
         ))}
       </Slider>
     </>

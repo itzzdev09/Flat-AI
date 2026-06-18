@@ -37,7 +37,7 @@ const PieChart = ({ data = [] }) => {
     type: 'pie',
     hole: 0.48,
     marker: {
-      colors: chartPalette,
+      colors: [chartPalette[0], chartPalette[1], chartPalette[2], chartPalette[5], chartPalette[6], chartPalette[7], chartPalette[3]],
     },
     hoverinfo: 'label+percent',
     textinfo: 'label+percent', 

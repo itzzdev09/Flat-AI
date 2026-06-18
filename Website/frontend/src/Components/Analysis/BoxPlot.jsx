@@ -23,10 +23,10 @@ const BoxPlot = ({ data = [] }) => {
     name: group,
     boxpoints: 'outliers',
     marker: {
-      color: chartPalette[index % chartPalette.length],
+      color: chartPalette[index % 2],
       size: 5,
     },
-    fillcolor: `${chartPalette[index % chartPalette.length]}33`,
+    fillcolor: 'rgba(30, 58, 138, 0.14)',
   }));
 
   const widestSpread = groupedData

@@ -31,9 +31,9 @@ const HistogramPlot = ({ data = [] }) => {
               data={[{
                 x: priceSeries,
                 type: 'histogram',
-                marker: { color: chartPalette[1], line: { width: 1, color: 'rgba(7, 12, 24, 0.96)' } },
+                marker: { color: chartPalette[0], line: { width: 1, color: '#ffffff' } },
                 nbinsx: 24,
-                opacity: 0.92,
+                opacity: 0.88,
               }]}
               layout={chartLayout({
                 title: 'Distribution of asking prices',
@@ -50,7 +50,7 @@ const HistogramPlot = ({ data = [] }) => {
                       y0: 0,
                       y1: 1,
                       yref: 'paper',
-                      line: { color: chartPalette[3], width: 3, dash: 'dash' },
+                      line: { color: chartPalette[5], width: 2.5, dash: 'dash' },
                     },
                     {
                       type: 'line',
@@ -59,7 +59,7 @@ const HistogramPlot = ({ data = [] }) => {
                       y0: 0,
                       y1: 1,
                       yref: 'paper',
-                      line: { color: chartPalette[1], width: 3, dash: 'dot' },
+                      line: { color: chartPalette[1], width: 2.5, dash: 'dot' },
                     },
                   ],
                 },
