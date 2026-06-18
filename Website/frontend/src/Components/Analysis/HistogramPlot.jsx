@@ -64,6 +64,7 @@ const HistogramPlot = ({ data = [] }) => {
                   ],
                 },
               })}
+              config={{ displayModeBar: false, responsive: true }}
               useResizeHandler
               style={{ width: '100%', height: '100%' }}
             />

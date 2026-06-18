@@ -56,6 +56,7 @@ const BoxPlot = ({ data = [] }) => {
                 },
                 showlegend: false,
               })}
+              config={{ displayModeBar: false, responsive: true }}
               useResizeHandler={true}
               style={{ width: '100%', height: '100%' }}
             />

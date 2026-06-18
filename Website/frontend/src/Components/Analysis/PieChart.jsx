@@ -79,12 +79,13 @@ const PieChart = ({ data = [] }) => {
                 <div className="analytics-plot-shell" style={{ height: '500px' }}>
                   <Plot
                     data={pieData}
-                    layout={chartLayout({
+                  layout={chartLayout({
                       title: `Distribution of ${categoryLabels[xAxis]}`,
                       yaxis: {},
                       xaxis: {},
                       extra: { margin: { l: 24, r: 24, t: 60, b: 32 } },
                     })}
+                    config={{ displayModeBar: false, responsive: true }}
                     useResizeHandler={true}
                     style={{ width: '100%', height: '100%' }}
                   />

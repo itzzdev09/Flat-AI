@@ -103,11 +103,12 @@ const ScatterPlot = ({ data = [] }) => {
             <div className="analytics-plot-shell" style={{ height: '500px' }}>
               <Plot
                 data={plotData}
-                layout={chartLayout({
+              layout={chartLayout({
                   title: `${categoryLabels[xAxis]} vs ${categoryLabels[yAxis]}`,
                   xaxis: { title: { text: categoryLabels[xAxis] } },
                   yaxis: { title: { text: categoryLabels[yAxis] } },
                 })}
+                config={{ displayModeBar: false, responsive: true }}
                 useResizeHandler
                 style={{ width: '100%', height: '100%' }}
               />
