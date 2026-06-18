@@ -78,7 +78,7 @@ const Auth = ({ mode }) => {
             <h3>{isSignup ? 'Create a clean property account' : 'Welcome back to your property desk'}</h3>
             <p>
               Save homes, keep prediction history, and move between search and recommendations
-              with a secure session handled by the Node API.
+              with a secure session handled by us.
             </p>
             <div className="auth-points">
               <div className="auth-point">

@@ -84,7 +84,7 @@ const SuggestedProperty = ({ id }) => {
       <div className="section-heading">
         <div>
           <h2>Similar homes</h2>
-          <p>Recommendations ranked by the Django service and hydrated through the Node API.</p>
+          <p>House that feels like homes.</p>
         </div>
       </div>
 
