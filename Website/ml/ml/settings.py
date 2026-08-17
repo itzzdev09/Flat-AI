@@ -9,8 +9,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings are kept here for local use.
 # The production checklist is documented at https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: the secret key used in production remains secret.
-SECRET_KEY = 'django-insecure-@257x$$hqhwc^blgs*hqbb%s$hkbc@&)jt%!-$kepf5m)3v$5w'
+# SECURITY WARNING: configure a strong secret in the deployment environment.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    raise RuntimeError('DJANGO_SECRET_KEY is not configured')
 
 # SECURITY WARNING: debug mode stays off in production.
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() == 'true'

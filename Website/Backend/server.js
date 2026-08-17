@@ -74,9 +74,13 @@ app.get('/api/allfilteredData', async (req, res) => {
 // Server bootstrap
 const PORT = process.env.PORT || 4002
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'admin@flat.ai').toLowerCase().trim()
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'secret12'
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
 const ensureBootstrapAdmin = async () => {
+  if (!ADMIN_PASSWORD) {
+    console.warn('Admin bootstrap skipped: ADMIN_PASSWORD is not configured')
+    return
+  }
   const existingAdmin = await findUserByEmail(ADMIN_EMAIL);
   if (existingAdmin) return;
 

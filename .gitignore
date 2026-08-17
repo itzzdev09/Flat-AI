@@ -7,6 +7,7 @@
 **/.env.test.local
 **/.env.production
 **/.env.production.local
+**/.env.*.local
 
 # Local dependencies and runtime state
 **/node_modules/
@@ -14,5 +15,10 @@
 **/build/
 **/db.sqlite3
 **/*.sqlite3
+**/__pycache__/
+**/*.py[cod]
+**/*.log
+*.pem
+*.key
 README.md
 readme.md
