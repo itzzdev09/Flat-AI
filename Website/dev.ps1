@@ -10,7 +10,15 @@ if (Test-Path $backendEnvPath) {
     }
 }
 
+$mlEnvPath = Join-Path $PSScriptRoot "ml\.env"
 $mlEnv = @{}
+if (Test-Path $mlEnvPath) {
+    Get-Content $mlEnvPath | ForEach-Object {
+        if ($_ -match '^\s*#' -or $_ -notmatch '=') { return }
+        $parts = $_ -split '=', 2
+        $mlEnv[$parts[0].Trim()] = $parts[1].Trim()
+    }
+}
 foreach ($key in @('MONGODB_URI', 'MONGODB_URI_ATLAS', 'MONGO_URI')) {
     if ($backendEnv.ContainsKey($key)) {
         $mlEnv[$key] = $backendEnv[$key]
@@ -34,7 +42,7 @@ if ($LASTEXITCODE -ne 0) {
 $services = @(
     @{ Name = "backend"; Directory = Join-Path $PSScriptRoot "Backend"; Command = "node server.js"; Environment = $backendEnv },
     @{ Name = "frontend"; Directory = Join-Path $PSScriptRoot "frontend"; Command = "npm start"; Environment = @{} },
-    @{ Name = "ml"; Directory = Join-Path $PSScriptRoot "ml"; Command = "`"$pythonExe`" manage.py runserver 0.0.0.0:8000"; Environment = $mlEnv }
+    @{ Name = "ml"; Directory = Join-Path $PSScriptRoot "ml"; Command = "& `"$pythonExe`" manage.py runserver 0.0.0.0:8000"; Environment = $mlEnv }
 )
 
 $jobs = foreach ($service in $services) {
