@@ -2,6 +2,8 @@
 
 A MERN-based platform for property listings with ML-powered price prediction and recommendations.
 
+**Live demo:** [flat-ai.vercel.app](https://flat-ai.vercel.app)
+
 ## Project Structure
 
 ```
@@ -48,3 +50,7 @@ node --test tests/
 ## Deployment
 
 Deployment configuration for Vercel is in [`vercel.json`](./vercel.json).
+
+## License
+
+MIT — see [LICENSE](./LICENSE).
