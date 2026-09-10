@@ -80,6 +80,13 @@ cd Website/frontend
 npm test -- --watchAll=false
 ```
 
+ML service tests use the Django runner:
+
+```bash
+cd Website/ml
+python manage.py test
+```
+
 ## Deployment
 
 Deployment configuration for Vercel is in [`vercel.json`](./vercel.json).
