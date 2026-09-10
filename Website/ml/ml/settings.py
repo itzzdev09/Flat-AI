@@ -2,8 +2,15 @@
 import os
 from pathlib import Path
 
+from .env import load_env_file
+
 # Project paths are built inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load Website/ml/.env before any setting is read. Without this the shipped
+# .env.example was inert: settings only consulted os.environ, so a copied .env
+# changed nothing and the service refused to start.
+load_env_file(BASE_DIR / '.env')
 
 
 # Quick-start development settings are kept here for local use.
