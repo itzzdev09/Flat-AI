@@ -105,7 +105,10 @@ const similarityScore = (source, target) => {
   if (source.AGE === target.AGE) score += 0.1
   if (source.FURNISH === target.FURNISH) score += 0.1
   if (source.amenity_luxury === target.amenity_luxury) score += 0.1
-  if (source.FLOOR_NUM === target.FLOOR_NUM) score += 0.05
+  // The dataset stores FLOOR_NUM as a number while the form sends a band
+  // ('Low Floor' / 'Mid Floor' / 'High Floor'), so compare like with like.
+  // Comparing them directly made this signal always false.
+  if (source.FLOOR_NUM && source.FLOOR_NUM === floorBandFromNumber(target.FLOOR_NUM)) score += 0.05
   if (asFloat(source.BALCONY_NUM) === asFloat(target.BALCONY_NUM)) score += 0.03
 
   const areaGap = Math.abs(asFloat(source.AREA) - asFloat(target.AREA))
@@ -215,6 +218,23 @@ const buildRecommendations = (query, properties, topN = 10) => {
   return scored.map(([item, score]) => hydrateRecommendation(item, score))
 }
 
+// A query with no usable area cannot produce a meaningful estimate. Without this
+// the maths below collapses to the 0.01 crore floor and the page presents that
+// as a real valuation.
+const validatePredictionQuery = (query) => {
+  const area = Number.parseFloat(query.area)
+  if (!Number.isFinite(area) || area <= 0) {
+    return { valid: false, message: 'A built-up area greater than 0 is required.' }
+  }
+
+  const bedroom = Number.parseFloat(query.bedroom)
+  if (query.bedroom !== undefined && query.bedroom !== '' && (!Number.isFinite(bedroom) || bedroom < 0)) {
+    return { valid: false, message: 'Bedroom count must be a non-negative number.' }
+  }
+
+  return { valid: true }
+}
+
 export const submitPrediction = async (req, res) => {
   try {
     const properties = await searchLocalOrMongoFlats({})
@@ -231,6 +251,11 @@ export const submitPrediction = async (req, res) => {
       furnish: req.body?.furnish,
       amenity: req.body?.amenity,
       floor: req.body?.floor,
+    }
+
+    const validation = validatePredictionQuery(query)
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.message })
     }
 
     const prediction = estimatePrice(query, properties)
