@@ -1,11 +1,14 @@
 {
-  "name": "your-project-name",
+  "name": "flat-ai",
   "version": "1.0.0",
   "scripts": {
     "start:backend": "cd Backend && node server.js",
     "start:frontend": "cd frontend && npm start",
     "start:ml": "cd ml && python manage.py runserver",
-    "dev": "powershell -ExecutionPolicy Bypass -File dev.ps1"
+    "dev": "powershell -ExecutionPolicy Bypass -File dev.ps1",
+    "test:backend": "cd Backend && npm test",
+    "test:frontend": "cd frontend && npm test -- --watchAll=false",
+    "test:ml": "cd ml && python manage.py test"
   },
   "devDependencies": {
     "concurrently": "^7.0.0"
