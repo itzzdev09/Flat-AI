@@ -29,8 +29,22 @@ export const filterByLocation = (data, locationInput = '') => {
 };
 
 export const toNumber = (value) => {
-  const number = Number(value);
-  return Number.isFinite(number) ? number : null;
+  // Number() coerces null, '', '   ', [] and false to 0, so a missing field used
+  // to read as a real 0: averages were dragged toward zero and histograms grew
+  // spurious bars at 0. Only actual numbers and numeric strings convert; anything
+  // else is null so callers can skip it, which they already do.
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const number = Number(trimmed);
+    return Number.isFinite(number) ? number : null;
+  }
+
+  return null;
 };
 
 export const normalizeCoordinates = (item) => {
