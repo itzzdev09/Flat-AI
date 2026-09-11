@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: Website/Backend/package-lock.json
+      - run: npm ci
+        working-directory: Website/Backend
+      - run: npm test
+        working-directory: Website/Backend
+
+  frontend:
+    name: Frontend build and tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: Website/frontend/package-lock.json
+      - run: npm ci
+        working-directory: Website/frontend
+      - run: npm test -- --watchAll=false
+        working-directory: Website/frontend
+        env:
+          CI: true
+      - run: npm run build
+        working-directory: Website/frontend
+        env:
+          CI: true
+          # The build only inlines these; nothing is contacted at build time.
+          REACT_APP_NODE_API_URL: http://localhost:4002/api/
+          REACT_APP_DJANGO_API_URL: http://localhost:8000/api/
+
+  ml:
+    name: ML service tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: Website/ml/requirements.txt
+      - run: pip install -r requirements.txt
+        working-directory: Website/ml
+      - run: python manage.py test
+        working-directory: Website/ml
+        env:
+          DJANGO_SECRET_KEY: ci-secret-not-used-outside-tests
+          DJANGO_DEBUG: 'false'
