@@ -17,7 +17,9 @@ jest.mock('./Pages/Auth', () => ({ mode }) => <div>{mode === 'signup' ? 'Signup 
 jest.mock('./Pages/Profile', () => () => <div>Profile Page</div>);
 jest.mock('./Pages/Admin', () => () => <div>Admin Page</div>);
 
-test('renders the home route shell', () => {
+// Route components are lazy, so the page resolves on a later tick than the
+// shell. Navbar and Footer stay eager and are asserted synchronously.
+test('renders the home route shell', async () => {
   render(
     <MemoryRouter initialEntries={['/']} future={FUTURE}>
       <App />
@@ -25,16 +27,16 @@ test('renders the home route shell', () => {
   );
 
   expect(screen.getByText('Navbar')).toBeInTheDocument();
-  expect(screen.getByText('Home Page')).toBeInTheDocument();
   expect(screen.getByText('Footer')).toBeInTheDocument();
+  expect(await screen.findByText('Home Page')).toBeInTheDocument();
 });
 
-test('renders analysis route', () => {
+test('renders analysis route', async () => {
   render(
     <MemoryRouter initialEntries={['/analysis']} future={FUTURE}>
       <App />
     </MemoryRouter>
   );
 
-  expect(screen.getByText('Analysis Page')).toBeInTheDocument();
+  expect(await screen.findByText('Analysis Page')).toBeInTheDocument();
 });
