@@ -17,7 +17,12 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-    <Router> 
+    {/* Opt in to the v7 behaviours now: state updates wrapped in
+        React.startTransition, and v7 relative-path resolution inside splat
+        routes. Without these react-router logs a deprecation warning on every
+        render, and enabling them early keeps the v7 upgrade from changing
+        behaviour underneath us. */}
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <App/>
       </Router>
       </Provider>
